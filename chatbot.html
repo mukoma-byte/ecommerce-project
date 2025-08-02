@@ -43,26 +43,22 @@
       }
 
       function ChatMessages() {
-        const array = React.useState([
+        const [chatMessages, setChatMessages] = React.useState([
           { message: "Hello chatbot", sender: "user" },
           { message: "Hello! How can I help you today?", sender: "robot" },
           { message: "can you get me todays date?", sender: "user" },
           { message: "Today is September 27", sender: "robot" },
         ]);
-
-        const chatMessages = array[0];
-        const setChatMessages = array[1];
-
-        function sendMessage(){
-        setChatMessages([
-          ...chatMessages,
-          {
-            message: "Test",
-            sender: "user",
-            key: crypto.randomUUID(),
-          },
-        ]);
-      }
+        function sendMessage() {
+          setChatMessages([
+            ...chatMessages,
+            {
+              message: "Test",
+              sender: "user",
+              key: crypto.randomUUID(),
+            },
+          ]);
+        }
 
         return (
           <>
