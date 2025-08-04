@@ -8,6 +8,9 @@
 
     <script src="https://unpkg.com/supersimpledev/react.js"></script>
     <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+
+    <script src="https://unpkg.com/supersimpledev/chatbot.js"></script>
+
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
       function ChatInput({ chatMessages, setChatMessages }) {
@@ -16,16 +19,30 @@
           setInputText(event.target.value);
         }
         function sendMessage() {
-          setChatMessages([
+          //In react the state is updated after the code is finished
+          const newChatMessages = [
             ...chatMessages,
             {
               message: inputText,
               sender: "user",
               key: crypto.randomUUID(),
             },
+          ]
+          setChatMessages(newChatMessages);
+
+          const response = Chatbot.getResponse(inputText);
+          setChatMessages([
+            ...newChatMessages,
+            {
+              message: response,
+              sender: "robot",
+              key: crypto.randomUUID(),
+            },
           ]);
-          setInputText("")
+
+          setInputText("");
         }
+
         return (
           <>
             <input
