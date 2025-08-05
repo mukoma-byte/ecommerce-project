@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>3g</title>
+  </head>
+  <body>
+    <div class="js-container"></div>
+
+    <script src="https://unpkg.com/supersimpledev/react.js"></script>
+    <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+    <script src="https://unpkg.com/supersimpledev/babel.js"></script>
+    <script type="text/babel">
+      function Input({ text, setText }) {
+        function updateText(e) {
+          setText(e.target.value);
+        }
+        return (
+          <input
+            placeholder="Type a name here"
+            onChange={updateText}
+            value={text}
+          ></input>
+        );
+      }
+
+      function Buttons({text, setText}) {
+         function reset() {
+          setText("");
+        }
+         function setExample() {
+          setText("Sean");
+        }
+        
+        return (
+          <>
+            <button onClick={reset}>Reset</button>
+            <button onClick={setExample}>Example</button>
+           
+          </>
+        );
+      }
+      function App() {
+        const [text, setText] = React.useState("");
+
+       
+       return (
+          <>
+            <Input text={text} setText={setText}/>
+            <Buttons text={text} setText={setText}/>
+             <p>Hello {text}</p>
+          </>
+        );
+      }
+      const container = document.querySelector(".js-container");
+      const root = ReactDOM.createRoot(container);
+      root.render(<App />);
+    </script>
+  </body>
+</html>
