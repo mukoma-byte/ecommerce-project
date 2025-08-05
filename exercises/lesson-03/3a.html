@@ -8,31 +8,24 @@
 
     <script src="https://unpkg.com/supersimpledev/react.js"></script>
     <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
-
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
-
       function App() {
-        const [chatMessages, setChatMessages] = React.useState([
-          { message: "Hello chatbot", sender: "user" },
-          { message: "Hello! How can I help you today?", sender: "robot" },
-          { message: "can you get me todays date?", sender: "user" },
-          { message: "Today is September 27", sender: "robot" },
-        ]);
+        const [count, setCount] = React.useState(0);
+        function updateCount() {
+          setCount(count + 1);
+        }
         return (
           <>
-            <ChatInput
-              chatMessages={chatMessages}
-              setChatMessages={setChatMessages}
-            />
-            <ChatMessages chatMessages={chatMessages} />
+            <button onClick={updateCount}>
+              Clicked {count} {count === 1 ? "time" : "times"}{" "}
+            </button>
           </>
         );
       }
-
       const container = document.querySelector(".js-container");
       const root = ReactDOM.createRoot(container);
       root.render(<App />);
-         </script>
+    </script>
   </body>
 </html>
