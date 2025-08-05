@@ -10,16 +10,28 @@
     <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
-      function App() {
-        const [count, setCount] = React.useState(0);
+      function Count({count, setCount}) {
         function updateCount() {
           setCount(count + 1);
         }
         return (
           <>
             <button onClick={updateCount}>
-              Clicked {count} {count === 1 ? "time" : "times"}{" "}
+              Clicked {count} {count === 1 ? "time" : "times"}
             </button>
+          </>
+        );
+      }
+      function App() {
+        const [count, setCount] = React.useState(0);
+        function reset(){
+          setCount(0);
+        }
+        return (
+          <>
+            <Count count={count} setCount={setCount} />
+            <Count count={count} setCount={setCount} />
+            <button onClick={reset}>Reset</button>
           </>
         );
       }
