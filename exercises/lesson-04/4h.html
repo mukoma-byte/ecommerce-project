@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>3a</title>
+    <style>
+      body{
+        margin: 0;
+        padding: 0;
+      }
+
+      .btn-container{
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .btn{
+        background-color: rgb(25, 135, 84);
+        color: white;
+        padding: 10px ;
+        border: none;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="js-container"></div>
+
+    <script src="https://unpkg.com/supersimpledev/react.js"></script>
+    <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+    <script src="https://unpkg.com/supersimpledev/babel.js"></script>
+    <script type="text/babel">
+     
+      function App() {
+        const [count, setCount] = React.useState(0);
+        const btnRef = React.useRef(null)
+        function reset(){
+          setCount(0);
+        }
+
+         function updateCount() {
+          setCount(count + 1);
+        }
+
+        function autoClick(){
+         const btnEl = btnRef.current;
+         setInterval(() => {
+          btnEl.click()
+         }, 1000)
+        }
+        return (
+          <div className="btn-container">
+            <button className="btn" onClick={updateCount} ref={btnRef}>
+              Clicked {count} {count === 1 ? "time" : "times"}
+            </button>
+            <button className="btn" onClick={reset}>Reset</button>
+            <button className="btn" onClick={autoClick}>Auto Click</button>
+          </div>
+        );
+      }
+      const container = document.querySelector(".js-container");
+      const root = ReactDOM.createRoot(container);
+      root.render(<App />);
+    </script>
+  </body>
+</html>

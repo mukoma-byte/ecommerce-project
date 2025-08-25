@@ -4,7 +4,7 @@
     <title>Chatbot</title>
     <style>
       body {
-        font-family: Arail;
+        font-family: Arial;
         margin: 0px;
 
       }
@@ -73,6 +73,16 @@
         overflow: scroll;
         scrollbar-width: none;
       }
+
+      .welcome-message{
+        text-align: center;
+        color: grey;
+      }
+
+      .loading-spinner{
+        height: 40px;
+        margin: -15px;
+      }
     </style>
   </head>
   <body>
@@ -90,8 +100,10 @@
         function saveInput(event) {
           setInputText(event.target.value);
         }
-        function sendMessage() {
+       async function sendMessage() {
           //In react the state is updated after the code is finished
+          setInputText('')
+
           const newChatMessages = [
             ...chatMessages,
             {
@@ -100,17 +112,28 @@
               key: crypto.randomUUID(),
             },
           ];
-          setChatMessages(newChatMessages);
-
-          const response = Chatbot.getResponse(inputText);
-          setChatMessages([
+          
+            setChatMessages([
+            ...newChatMessages,
+            {
+              message: <img src="./loading-spinner.gif" alt="loading spinner" className="loading-spinner"/>,
+              sender: "robot",
+              key: crypto.randomUUID(),
+            },
+          ]);
+          const response = await Chatbot.getResponseAsync(inputText);
+        
+          setTimeout(() => {
+            setChatMessages([
             ...newChatMessages,
             {
               message: response,
               sender: "robot",
               key: crypto.randomUUID(),
             },
-          ]);
+          ])                                                                                                                                                                                                                                            
+          }, 800);
+          
 
           setInputText("");
         }
@@ -164,13 +187,7 @@
       }
 
       function ChatMessages({ chatMessages }) {
-        const chatMessagesRef = React.useRef(null);
-        React.useEffect(() => {
-        const containerElem = chatMessagesRef.current
-        if(containerElem){
-          containerElem.scrollTop = containerElem.scrollHeight;
-        }
-        }, [chatMessages])
+        const chatMessagesRef = useAutoScroll([chatMessages]);
         return (
           <div 
             className="chat-messages-container"
@@ -188,15 +205,27 @@
         );
       }
 
+      function useAutoScroll(dependencies){
+         const chatMessagesRef = React.useRef(null);
+        React.useEffect(() => {
+        const containerElem = chatMessagesRef.current
+        if(containerElem){
+          containerElem.scrollTop = containerElem.scrollHeight;
+        }
+        }, dependencies)
+         return chatMessagesRef;
+      }
+
       function App() {
         const [chatMessages, setChatMessages] = React.useState([
-          { message: "Hello chatbot", sender: "user" },
-          { message: "Hello! How can I help you today?", sender: "robot" },
-          { message: "can you get me todays date?", sender: "user" },
-          { message: "Today is September 27", sender: "robot" },
+          // { message: "Hello chatbot", sender: "user" },
+          // { message: "Hello! How can I help you today?", sender: "robot" },
+          // { message: "can you get me todays date?", sender: "user" },
+          // { message: "Today is September 27", sender: "robot" },
         ]);
         return (
           <div className="app-container">
+            {chatMessages.length === 0?<p className="welcome-message">Welcome to the chatbot project! Send a message using the textbox below.</p>:''}
             <ChatMessages chatMessages={chatMessages} />
             <ChatInput
               chatMessages={chatMessages}
