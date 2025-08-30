@@ -1,7 +1,13 @@
+import { useEffect } from "react";
 import { CheckoutHeader } from "./CheckoutHeader";
 import "./CheckoutPage.css";
 
-export function CheckoutPage() {
+export function CheckoutPage({cart}) {
+  useEffect(() => {
+    console.log(
+    cart
+    )
+  }, [cart])
   return (
     <>
       <link rel="icon" type="image/svg+xml" href="images/cart-favicon.png" />
