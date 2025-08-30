@@ -7,10 +7,10 @@ import './Header.css'
 
 
 export function Header({cart}){
-   let total = 0;
+   let totalQuantity = 0;
 
    cart.forEach((cartItem) => {
-     total += cartItem.quantity;
+     totalQuantity += cartItem.quantity;
    });
 
   return (
@@ -37,7 +37,7 @@ export function Header({cart}){
 
         <NavLink className="cart-link header-link" to="/checkout">
           <img className="cart-icon" src={CartIcon} />
-          <div className="cart-quantity">{total}</div>
+          <div className="cart-quantity">{totalQuantity}</div>
           <div className="cart-text">Cart</div>
         </NavLink>
       </div>
