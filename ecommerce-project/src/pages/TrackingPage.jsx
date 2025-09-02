@@ -2,12 +2,12 @@ import { Header } from "../components/Header";
 import { Link } from "react-router";
 import './TrackingPage.css'
 
-export function TrackingPage(){
+export function TrackingPage({cart}){
   return (
     <>
       <title>Tracking</title>
 
-      <Header />
+      <Header cart={cart}/>
 
       <div className="tracking-page" >
         <div className="order-tracking">
@@ -25,7 +25,7 @@ export function TrackingPage(){
 
           <img
             className="product-image"
-            src="images/products/Linkthletic-cotton-socks-6-pairs.jpg"
+            src="images/products/athletic-cotton-socks-6-pairs.jpg"
           />
 
           <div className="progress-labels-container">

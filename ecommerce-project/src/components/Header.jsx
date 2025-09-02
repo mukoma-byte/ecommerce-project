@@ -7,7 +7,7 @@ import './Header.css'
 
 
 export function Header({cart}){
-  console.log(cart)
+  
    let totalQuantity = 0;
 
    cart.forEach((cartItem) => {
