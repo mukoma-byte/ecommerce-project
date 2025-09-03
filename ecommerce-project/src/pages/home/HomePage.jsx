@@ -5,27 +5,24 @@ import { Header } from "../../components/Header";
 import "./HomePage.css";
 
 
-export function HomePage({cart}) {
+export function HomePage({ cart, loadCart }) {
   const [products, setProducts] = useState([]);
-
-  
 
   useEffect(() => {
     axios.get("/api/products").then((response) => {
       setProducts(response.data);
     });
-   
-  }, [])
-  
+  }, []);
+
   return (
     <>
       <link rel="icon" type="image/svg+xml" href="images/home-favicon.png" />
       <title>Home Page</title>
 
-      <Header cart={cart}/>
+      <Header cart={cart} />
 
       <div className="home-page">
-        <ProductGrid products={products}/>
+        <ProductGrid products={products} loadCart={loadCart} />
       </div>
     </>
   );
