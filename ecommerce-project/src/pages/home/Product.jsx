@@ -11,23 +11,27 @@ The final solution was to separate the product into its own component. This way,
 */
 export function Product({ product, loadCart }) {
   const [quantity, setQuantity] = useState(1);
+  const [isItemInCart, setIsItemInCart] = useState(false);
   const addToCart = async () => {
-          await axios.post("/api/cart-items", {
-            productId: product.id,
-            quantity
-            // quantity: quantity,
-          });
+    await axios.post("/api/cart-items", {
+      productId: product.id,
+      quantity,
+      // quantity: quantity,
+    });
 
-          await loadCart();
+    await loadCart();
+    setIsItemInCart(true);
+    setTimeout(() => {
+      setIsItemInCart(false);
+    }, 2000);
+  };
 
-        }
-  function selectQuantity(e){
-    const quantitySelected = Number(e.target.value)
+  function selectQuantity(e) {
+    const quantitySelected = Number(e.target.value);
     setQuantity(quantitySelected);
-
   }
   return (
-    <div  className="product-container">
+    <div className="product-container">
       <div className="product-image-container">
         <img className="product-image" src={product.image} />
       </div>
@@ -47,11 +51,7 @@ export function Product({ product, loadCart }) {
       <div className="product-price">{formatMoney(product.priceCents)}</div>
 
       <div className="product-quantity-container">
-        <select
-        
-          value={quantity}
-          onChange={selectQuantity}
-        >
+        <select value={quantity} onChange={selectQuantity}>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -67,15 +67,12 @@ export function Product({ product, loadCart }) {
 
       <div className="product-spacer"></div>
 
-      <div className="added-to-cart">
+      <div className="added-to-cart" style={{ opacity: isItemInCart ? 1 : 0 }}>
         <img src={CheckmarkIcon} />
         Added
       </div>
 
-      <button
-        className="add-to-cart-button button-primary"
-        onClick={addToCart}
-      >
+      <button className="add-to-cart-button button-primary" onClick={addToCart}>
         Add to Cart
       </button>
     </div>
