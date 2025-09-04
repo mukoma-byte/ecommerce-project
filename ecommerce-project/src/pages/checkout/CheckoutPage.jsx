@@ -8,19 +8,25 @@ import "./CheckoutPage.css";
 export function CheckoutPage({ cart, loadCart }) {
   const [deliveryOptions, setDeliveryOptions] = useState([]);
   const [paymentSummary, setPaymentSummary] = useState(null);
-  
+
   useEffect(() => {
     async function fetchCheckoutData() {
-      let response = await axios.get(
+      const response = await axios.get(
         "/api/delivery-options?expand=estimatedDeliveryTime"
       );
       setDeliveryOptions(response.data);
-
-      response = await axios.get("/api/payment-summary");
-      setPaymentSummary(response.data);
     }
 
     fetchCheckoutData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPaymentSummary() {
+      let response = await axios.get("/api/payment-summary");
+      setPaymentSummary(response.data);
+    }
+
+    fetchPaymentSummary();
   }, [cart]);
   /*Here we used cart as the dependancy, so that when ever it changes... payment summary is updated,,,, in the case where we update a delivery option of a product(different delivery options have different price ranges) ---- but we are also reloading the delivery options which is not necessary,,,because we update the delivery option in the cart.....then reload the cart, so we will separate the code which renders the payment summary into it's own useEffect*/
   return (
