@@ -5,14 +5,19 @@ export function CartItemDetails({ cartItem, loadCart }) {
   /*
   The state showInput is used to toggle whether update has been clicked. If it has been clicked a text box is displayed...if clicked again it is hidden
   */ 
- const [showInput, setShowInput] = useState(false)
+ const [isUpdating, setIsUpdating] = useState(false);
 
  const [quantity, setQuantity] = useState(cartItem.quantity)
-  const toggleInput = () => {
-    if(showInput){
-      setShowInput(false)
-    }else{
-      setShowInput(true)
+  const toggleInput = async () => {
+    if (isUpdating) {
+      await axios.put(`/api/cart-items/${cartItem.productId}`, {
+        quantity: Number(quantity)
+      })
+      await loadCart();
+      setIsUpdating(false);
+
+    } else {
+      setIsUpdating(true);
     }
   }
   const deleteCartItem = async () => {
@@ -30,10 +35,23 @@ export function CartItemDetails({ cartItem, loadCart }) {
         <div className="product-quantity">
           <span>
             Quantity:
-            {showInput ? (
-              <input type="number" className="quantity-input" value={quantity} onChange={(e) => {
-                setQuantity(e.target.value)
-              }}/>
+            {isUpdating ? (
+              <input
+                type="number"
+                className="quantity-input"
+                value={quantity}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter"){
+                    toggleInput()
+                  }else if(e.key === "Escape"){
+                    setQuantity(cartItem.quantity)
+                    setIsUpdating(false)
+                  }
+                }}
+                onChange={(e) => {
+                  setQuantity(e.target.value);
+                }}
+              />
             ) : (
               ""
             )}
