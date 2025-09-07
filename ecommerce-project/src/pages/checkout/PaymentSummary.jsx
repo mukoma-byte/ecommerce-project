@@ -11,10 +11,10 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
   };
   /*Here there is a create order function that runs when place order is clicked...we use the post request to the backend which clears the cart to act like we actually sent a request and it also creates an order*/
   return (
-    <div className="payment-summary">
+    <div className="payment-summary" data-testid="payment-summary">
       <div className="payment-summary-title">Payment Summary</div>
 
-      <div className="payment-summary-row">
+      <div className="payment-summary-row" data-testid="total-items">
         <div>Items ({paymentSummary.totalItems}):</div>
         <div className="payment-summary-money">
           {formatMoney(paymentSummary.productCostCents)}
