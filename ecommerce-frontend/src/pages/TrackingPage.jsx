@@ -14,6 +14,7 @@ export function TrackingPage({cart}){
     async function fetchTrackingPageData(){
       const response = await axios.get(`/api/orders/${orderId}?expand=products`)
       setOrder(response.data)
+      
     }
     fetchTrackingPageData();
   }, [orderId])
