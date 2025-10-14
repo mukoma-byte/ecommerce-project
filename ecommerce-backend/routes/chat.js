@@ -1,31 +1,33 @@
-// server.js or routes/chat.js
+// routes/chat.js
 import express from "express";
 import OpenAI from "openai";
 import { readFile } from "fs/promises";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import dotenv from "dotenv";
-dotenv.config(); // Load environment variables
 
+dotenv.config(); // Load environment variables
 
 const router = express.Router();
 
-// Initialize OpenAI
+// Initialize OpenAI with API key from .env
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Get current directory for ES6 modules
+// ES module __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-console.log("dirname"+ __dirname)
+
+// Path to your products.json
+const productsPath = join(__dirname, "../backend/products.json");
 
 // Load products from JSON file
 let products = [];
 
 async function loadProducts() {
   try {
-    const data = await readFile(join(__dirname, "../backend/products.json"), "utf8");
+    const data = await readFile(productsPath, "utf8");
     const productData = JSON.parse(data);
 
     // Handle both { products: [] } and direct array formats
@@ -36,15 +38,14 @@ async function loadProducts() {
     console.log(`✅ Loaded ${products.length} products from JSON file`);
   } catch (error) {
     console.error("❌ Error loading products JSON:", error);
-    // Fallback to empty array
     products = [];
   }
 }
 
-// Load products when server starts
+// Load products at startup
 await loadProducts();
 
-// Function to search products based on criteria
+// Function to search products
 function searchProducts(category, maxPrice, minPrice, searchTerm) {
   let results = [...products];
 
@@ -53,14 +54,10 @@ function searchProducts(category, maxPrice, minPrice, searchTerm) {
       (p) => p.category.toLowerCase() === category.toLowerCase()
     );
   }
-
-  if (maxPrice !== undefined) {
+  if (maxPrice !== undefined)
     results = results.filter((p) => p.price <= maxPrice);
-  }
-
-  if (minPrice !== undefined) {
+  if (minPrice !== undefined)
     results = results.filter((p) => p.price >= minPrice);
-  }
 
   if (searchTerm) {
     results = results.filter(
@@ -82,6 +79,7 @@ router.post("/", async (req, res) => {
   try {
     const { messages } = req.body;
 
+    // Tool definition
     const tools = [
       {
         type: "function",
@@ -92,11 +90,7 @@ router.post("/", async (req, res) => {
           parameters: {
             type: "object",
             properties: {
-              category: {
-                type: "string",
-                description:
-                  "Product category (e.g., 'socks', 'shoes', 'shirts')",
-              },
+              category: { type: "string", description: "Product category" },
               maxPrice: {
                 type: "number",
                 description: "Maximum price in dollars",
@@ -105,83 +99,87 @@ router.post("/", async (req, res) => {
                 type: "number",
                 description: "Minimum price in dollars",
               },
-              searchTerm: {
-                type: "string",
-                description:
-                  "Keywords to search in product name or description",
-              },
+              searchTerm: { type: "string", description: "Keywords to search" },
             },
           },
         },
       },
     ];
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `You are a helpful shopping assistant for an e-commerce store. 
-          Help users find products they're looking for. When users ask about products, 
-          use the search_products function to find relevant items. Be friendly and concise.
-          
-          Available product categories: ${[
-            ...new Set(products.map((p) => p.category)),
-          ].join(", ")}
-          Price range: $${Math.min(
-            ...products.map((p) => p.price)
-          )} - $${Math.max(...products.map((p) => p.price))}`,
-        },
-        ...messages,
-      ],
-      tools: tools,
-      tool_choice: "auto",
-    });
+    // Call OpenAI
+    let response;
+    try {
+      response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo", // Free-tier friendly
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful shopping assistant for an e-commerce store. 
+            Available categories: ${[
+              ...new Set(products.map((p) => p.category)),
+            ].join(", ")}.
+            Price range: $${Math.min(
+              ...products.map((p) => p.price)
+            )} - $${Math.max(
+              ...products.map((p) => p.price)
+            )}. Use the search_products function when needed.`,
+          },
+          ...messages,
+        ],
+        tools,
+        tool_choice: "auto",
+      });
+    } catch (err) {
+      // Handle free-tier quota exceeded
+      if (err.code === "insufficient_quota" || err.status === 429) {
+        return res.json({
+          message:
+            "Sorry, the AI assistant is temporarily unavailable due to API limits.",
+          products: [],
+        });
+      } else {
+        throw err;
+      }
+    }
 
     const assistantMessage = response.choices[0].message;
 
-    if (assistantMessage.tool_calls) {
+    // Handle tool calls locally without making a second OpenAI call
+    if (assistantMessage?.tool_calls?.length > 0) {
       const toolCall = assistantMessage.tool_calls[0];
       const functionName = toolCall.function.name;
       const functionArgs = JSON.parse(toolCall.function.arguments);
 
+      let foundProducts = [];
       if (functionName === "search_products") {
-        const foundProducts = searchProducts(
+        foundProducts = searchProducts(
           functionArgs.category,
           functionArgs.maxPrice,
           functionArgs.minPrice,
           functionArgs.searchTerm
         );
-
-        const secondResponse = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: `You are a helpful shopping assistant. Present product results in a friendly way.
-              If no products were found, suggest other categories or price ranges.`,
-            },
-            ...messages,
-            assistantMessage,
-            {
-              role: "tool",
-              tool_call_id: toolCall.id,
-              content: JSON.stringify(foundProducts),
-            },
-          ],
-        });
-
-        res.json({
-          message: secondResponse.choices[0].message.content,
-          products: foundProducts.slice(0, 10), // Limit to 10 products
-        });
       }
-    } else {
-      res.json({
-        message: assistantMessage.content,
-        products: [],
+
+      // Format a friendly assistant message locally
+      const productText =
+        foundProducts.length > 0
+          ? foundProducts
+              .slice(0, 10)
+              .map((p) => `• ${p.name} - $${p.price}`)
+              .join("\n")
+          : "No products found. Try different categories or price ranges.";
+
+      return res.json({
+        message: `Here are the products I found:\n${productText}`,
+        products: foundProducts.slice(0, 10),
       });
     }
+
+    // If no tool call, just return the assistant's message
+    res.json({
+      message: assistantMessage.content,
+      products: [],
+    });
   } catch (error) {
     console.error("OpenAI API Error:", error);
     res.status(500).json({
