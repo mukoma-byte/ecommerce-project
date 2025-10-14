@@ -9,6 +9,7 @@ function FloatingChatbot() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
@@ -57,7 +58,7 @@ function FloatingChatbot() {
       setLoading(false);
     }
   };
-
+   
   return (
     <>
       {/* Floating Button */}
