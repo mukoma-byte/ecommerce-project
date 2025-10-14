@@ -1,14 +1,13 @@
 import dayjs from "dayjs";
 import axios from "axios";
 import { formatMoney } from "../../utils/money";
-import BuyAgainIcon from "../../assets/images/icons/buy-again.png"
+import BuyAgainIcon from "../../assets/images/icons/buy-again.png";
 import { Fragment } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 export function OrdersGrid({ orders, loadCart }) {
   return (
     <div className="orders-grid">
       {orders.map((order) => {
-      
         return (
           <div key={order.id} className="order-container">
             <div className="order-header">
@@ -30,14 +29,14 @@ export function OrdersGrid({ orders, loadCart }) {
             </div>
             <div className="order-details-grid">
               {order.products.map((orderProduct) => {
-                  const addToCart = async() => {
-                    await axios.post("/api/cart-items", {
-                      productId: orderProduct.productId,
-                      quantity: orderProduct.quantity
-                    });
+                const addToCart = async () => {
+                  await axios.post("/api/cart-items", {
+                    productId: orderProduct.productId,
+                    quantity: orderProduct.quantity,
+                  });
 
-                    await loadCart();
-                  }; 
+                  await loadCart();
+                };
                 return (
                   <Fragment key={orderProduct.productId}>
                     <div className="product-image-container">
@@ -57,7 +56,9 @@ export function OrdersGrid({ orders, loadCart }) {
                       </div>
                       <button className="buy-again-button button-primary">
                         <img className="buy-again-icon" src={BuyAgainIcon} />
-                        <span className="buy-again-message" onClick={addToCart}>Add to Cart</span>
+                        <span className="buy-again-message" onClick={addToCart}>
+                          Add to Cart
+                        </span>
                       </button>
                     </div>
 

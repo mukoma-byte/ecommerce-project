@@ -1,39 +1,44 @@
 import { Header } from "../components/Header";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import dayjs from "dayjs";
-import './TrackingPage.css'
+import "./TrackingPage.css";
 
-
-export function TrackingPage({cart}){
-  const {orderId, productId} = useParams()
-  const [order, setOrder] = useState(null)
+export function TrackingPage({ cart }) {
+  const { orderId, productId } = useParams();
+  const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    async function fetchTrackingPageData(){
-      const response = await axios.get(`/api/orders/${orderId}?expand=products`)
-      setOrder(response.data)
-      
+    async function fetchTrackingPageData() {
+      const response = await axios.get(
+        `/api/orders/${orderId}?expand=products`
+      );
+      setOrder(response.data);
     }
     fetchTrackingPageData();
-  }, [orderId])
- 
-  if(!order){return null;}
+  }, [orderId]);
+
+  if (!order) {
+    return null;
+  }
 
   const selectedProduct = order.products.find((product) => {
-    return productId === product.productId
-  })
-   
-  const totalDeliveryTimeMS = selectedProduct.estimatedDeliveryTimeMs - order.orderTimeMs
-  const timePassedMs = dayjs().valueOf() - order.orderTimeMs
+    return productId === product.productId;
+  });
 
-  let deliveryPercent = (timePassedMs/ totalDeliveryTimeMS) * 100
+  const totalDeliveryTimeMS =
+    selectedProduct.estimatedDeliveryTimeMs - order.orderTimeMs;
+  const timePassedMs = dayjs().valueOf() - order.orderTimeMs;
+
+  let deliveryPercent = (timePassedMs / totalDeliveryTimeMS) * 100;
   let isPreparing = deliveryPercent < 33;
   let isShipped = deliveryPercent >= 33 && deliveryPercent < 100;
   let isDelivered = deliveryPercent === 100;
 
-  if (deliveryPercent > 100){deliveryPercent = 100}
+  if (deliveryPercent > 100) {
+    deliveryPercent = 100;
+  }
   return (
     <>
       <title>Tracking</title>

@@ -1,71 +1,48 @@
-import { Routes, Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import { HomePage } from "./pages/home/HomePage";
 import { CheckoutPage } from "./pages/checkout/CheckoutPage";
 import { OrdersPage } from "./pages/orders/OrdersPage";
 import { TrackingPage } from "./pages/TrackingPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { Header } from "./components/Header";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import Profile from "./pages/profile/ProfilePage.jsx";
+
 import "./App.css";
-
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
-// ✅ Create AuthContext
-export const AuthContext = createContext(null);
 
 function App() {
   const [cart, setCart] = useState([]);
-  const [user, setUser] = useState(null); // stores logged-in user
-  window.axios = axios;
 
   const loadCart = async () => {
-    try {
-      const response = await axios.get("/api/cart-items?expand=product");
-      setCart(response.data);
-    } catch (error) {
-      console.error("Failed to load cart:", error);
-    }
+    const response = await axios.get("/api/cart-items?expand=product");
+    setCart(response.data);
   };
 
-  // ✅ Load user from localStorage (persisted login)
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-    if (savedUser && token) {
-      setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
     loadCart();
   }, []);
 
-  // ✅ Logout handler
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    delete axios.defaults.headers.common["Authorization"];
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, setUser, handleLogout }}>
-      <Header cart={cart} />
-      <Routes>
-        <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
-        <Route
-          path="checkout"
-          element={<CheckoutPage cart={cart} loadCart={loadCart} />}
-        />
-        <Route
-          path="orders"
-          element={<OrdersPage cart={cart} loadCart={loadCart} />}
-        />
-        <Route
-          path="tracking/:orderId/:productId"
-          element={<TrackingPage cart={cart} />}
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AuthContext.Provider>
+    <Routes>
+      <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
+      <Route path="checkout" element={<CheckoutPage cart={cart} />} />
+      <Route
+        path="orders"
+        element={
+          <ProtectedRoute>
+            <OrdersPage cart={cart} />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="login" element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
+      <Route path="tracking/:orderId/:productId" element={<TrackingPage />} />
+      <Route path="profile" element={<Profile />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
 

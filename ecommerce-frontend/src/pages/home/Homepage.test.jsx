@@ -2,7 +2,7 @@ import { it, expect, describe, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter } from "react-router-dom";
 import { HomePage } from "./HomePage";
 
 vi.mock("axios");
@@ -54,9 +54,9 @@ describe("HomePage component", () => {
       </MemoryRouter>
     );
 
-    const productContainers = await screen.findAllByTestId('product-container');
+    const productContainers = await screen.findAllByTestId("product-container");
 
-    expect(productContainers.length).toBe(2)
+    expect(productContainers.length).toBe(2);
 
     expect(
       within(productContainers[0]).getByText(
@@ -70,25 +70,25 @@ describe("HomePage component", () => {
   });
 
   it("adds a product to the cart", async () => {
-      render(
-        <MemoryRouter>
-          <HomePage cart={[]} loadCart={loadCart} />
-        </MemoryRouter>
-      );
+    render(
+      <MemoryRouter>
+        <HomePage cart={[]} loadCart={loadCart} />
+      </MemoryRouter>
+    );
     const productContainers = await screen.findAllByTestId("product-container");
-    
+
     const user = userEvent.setup();
 
-    const quantitySelector1 =  within(productContainers[0]).getByTestId(
+    const quantitySelector1 = within(productContainers[0]).getByTestId(
       "quantity-selector"
     );
-    const quantitySelector2 =  within(productContainers[1]).getByTestId(
+    const quantitySelector2 = within(productContainers[1]).getByTestId(
       "quantity-selector"
     );
 
-    user.selectOptions(quantitySelector1, '2')
+    user.selectOptions(quantitySelector1, "2");
 
-    user.selectOptions(quantitySelector2, '3')
+    user.selectOptions(quantitySelector2, "3");
 
     const addToCartButton1 = within(productContainers[0]).getByTestId(
       "add-to-cart-button"
@@ -108,8 +108,7 @@ describe("HomePage component", () => {
       productId: "15b6fc6f-327a-4ec4-896f-486349e85a3d",
       quantity: 3,
     });
-     
-    expect(loadCart).toHaveBeenCalledTimes(2)
 
-  })
+    expect(loadCart).toHaveBeenCalledTimes(2);
+  });
 });

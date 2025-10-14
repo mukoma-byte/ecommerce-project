@@ -1,41 +1,35 @@
-import { NavLink, useNavigate, useSearchParams } from "react-router";
-import { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext"; // ✅ import your AuthContext
-
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import CartIcon from "../assets/images/icons/cart-icon.png";
 import SearchIcon from "../assets/images/icons/search-icon.png";
 import LogoWhiteIcon from "../assets/images/logo-white.png";
 import MobileLogoWhiteIcon from "../assets/images/mobile-logo-white.png";
-
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import "./Header.css";
 
 export function Header({ cart }) {
-  // Initialize search input from URL
+  const { user, logout } = useContext(AuthContext) || {};
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const [searchParams] = useSearchParams();
   const search = searchParams.get("searchText");
   const [searchText, setSearchText] = useState(search || "");
-
   const navigate = useNavigate();
-
-  const { user, logout } = useContext(AuthContext); // ✅ access auth state
 
   const updateSearchInput = (e) => setSearchText(e.target.value);
 
   const searchProducts = () => {
     navigate(`/?searchText=${searchText}`);
+    setMenuOpen(false);
   };
 
-  // calculate total cart quantity
-  let totalQuantity = 0;
-  cart.forEach((cartItem) => {
-    totalQuantity += cartItem.quantity;
-  });
+  let totalQuantity = cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
-    <div className="header">
-      {/* LEFT SECTION — LOGO */}
+    <header className="header">
+      {/* Left Section */}
       <div className="left-section">
-        <NavLink to="/" className="header-link">
+        <NavLink to="/" className="header-link logo-link">
           <img className="logo" src={LogoWhiteIcon} alt="Logo" />
           <img
             className="mobile-logo"
@@ -43,63 +37,87 @@ export function Header({ cart }) {
             alt="Mobile Logo"
           />
         </NavLink>
-      </div>
 
-      {/* MIDDLE SECTION — SEARCH */}
-      <div className="middle-section">
-        <input
-          className="search-bar"
-          type="text"
-          placeholder="Search"
-          value={searchText}
-          onChange={updateSearchInput}
-          onKeyDown={(e) => e.key === "Enter" && searchProducts()}
-        />
-        <button className="search-button" onClick={searchProducts}>
-          <img className="search-icon" src={SearchIcon} alt="Search" />
+        {/* Hamburger Menu (visible only on mobile) */}
+        <button
+          className={`menu-toggle ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
 
-      {/* RIGHT SECTION — CART / AUTH LINKS */}
-      <div className="right-section">
-        {/* Orders link (optional — only visible if logged in) */}
-        {user && (
-          <NavLink className="orders-link header-link" to="/orders">
-            <span className="orders-text">Orders</span>
-          </NavLink>
-        )}
+      {/* Middle Section (Search bar) */}
+      <div className={`middle-section ${menuOpen ? "show" : ""}`}>
+        <div className="search-container">
+          <input
+            className="search-bar"
+            type="text"
+            placeholder="Search products..."
+            value={searchText}
+            onChange={updateSearchInput}
+            onKeyDown={(e) => e.key === "Enter" && searchProducts()}
+          />
+          <button className="search-button" onClick={searchProducts}>
+            <img className="search-icon" src={SearchIcon} alt="Search" />
+          </button>
+        </div>
+      </div>
 
-        {/* Cart link (always visible) */}
-        <NavLink className="cart-link header-link" to="/checkout">
-          <img className="cart-icon" src={CartIcon} alt="Cart" />
-          <div className="cart-quantity">{totalQuantity}</div>
-          <div className="cart-text">Cart</div>
+      {/* Right Section (Links + Cart + Auth) */}
+      <div className={`right-section ${menuOpen ? "show" : ""}`}>
+        <NavLink
+          className="orders-link header-link"
+          to="/orders"
+          onClick={() => setMenuOpen(false)}
+        >
+          Orders
         </NavLink>
 
-        {/* Authentication section */}
-        {!user ? (
-          // 👇 If not logged in
-          <div className="auth-links">
-            <NavLink to="/login" className="header-link">
-              Login
-            </NavLink>
-            <span className="divider"> | </span>
-            <NavLink to="/register" className="header-link">
-              Register
-            </NavLink>
-          </div>
-        ) : (
-          // 👇 If logged in
-          <div className="auth-user">
-            <NavLink to="/profile" className="header-link user-name">
-              {user.name || "My Profile"}
+        {user ? (
+          <>
+            <NavLink
+              className="profile-link header-link"
+              to="/profile"
+              onClick={() => setMenuOpen(false)}
+            >
+              {user.name || "Profile"}
             </NavLink>
             <button className="logout-btn" onClick={logout}>
               Logout
             </button>
-          </div>
+          </>
+        ) : (
+          <>
+            <NavLink
+              className="login-link header-link"
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+            >
+              Login
+            </NavLink>
+            <NavLink
+              className="register-link header-link"
+              to="/register"
+              onClick={() => setMenuOpen(false)}
+            >
+              Register
+            </NavLink>
+          </>
         )}
+
+        <NavLink
+          className="cart-link header-link"
+          to="/checkout"
+          onClick={() => setMenuOpen(false)}
+        >
+          <img className="cart-icon" src={CartIcon} alt="Cart" />
+          <div className="cart-quantity">{totalQuantity}</div>
+          <span className="cart-text">Cart</span>
+        </NavLink>
       </div>
-    </div>
+    </header>
   );
 }

@@ -1,13 +1,13 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import CheckoutLockIcon from "../../assets/images/icons/checkout-lock-icon.png";
 import Logo from "../../assets/images/logo.png";
 import MobileLogo from "../../assets/images/mobile-logo.png";
-import './CheckoutHeader.css';
+import "./CheckoutHeader.css";
 
-export function CheckoutHeader({cart}){
-  let totalItems = 0
-  cart.forEach(cartItem => {
-    totalItems += cartItem.quantity
+export function CheckoutHeader({ cart }) {
+  let totalItems = 0;
+  cart.forEach((cartItem) => {
+    totalItems += cartItem.quantity;
   });
   return (
     <div className="checkout-header">

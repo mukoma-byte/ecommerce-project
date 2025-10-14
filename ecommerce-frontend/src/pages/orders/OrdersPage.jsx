@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useEffect, useState, Fragment } from "react";
-import {OrdersGrid} from "./OrdersGrid"
+import { OrdersGrid } from "./OrdersGrid";
 import { Header } from "../../components/Header";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import BuyAgainIcon from "../../assets/images/icons/buy-again.png";
 
 import "./OrdersPage.css";
 
-export function OrdersPage({ cart, loadCart}) {
+export function OrdersPage({ cart, loadCart }) {
   const [orders, setOrders] = useState([]);
   useEffect(() => {
     async function fetchOrderData() {
