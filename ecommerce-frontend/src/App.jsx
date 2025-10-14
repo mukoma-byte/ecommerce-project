@@ -13,6 +13,8 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import FloatingChatbot from "./components/FloatingChatbot.jsx";
+
 function App() {
   const [cart, setCart] = useState([]);
 
@@ -26,23 +28,26 @@ function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
-      <Route path="checkout" element={<CheckoutPage cart={cart} />} />
-      <Route
-        path="orders"
-        element={
-          <ProtectedRoute>
-            <OrdersPage cart={cart} />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="login" element={<LoginPage />} />
-      <Route path="register" element={<RegisterPage />} />
-      <Route path="tracking/:orderId/:productId" element={<TrackingPage />} />
-      <Route path="profile" element={<Profile />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
+        <Route path="checkout" element={<CheckoutPage cart={cart} />} />
+        <Route
+          path="orders"
+          element={
+            <ProtectedRoute>
+              <OrdersPage cart={cart} />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="tracking/:orderId/:productId" element={<TrackingPage />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <FloatingChatbot />
+    </>
   );
 }
 
