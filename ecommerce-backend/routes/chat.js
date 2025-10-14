@@ -4,6 +4,9 @@ import OpenAI from "openai";
 import { readFile } from "fs/promises";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables
+
 
 const router = express.Router();
 
@@ -15,13 +18,14 @@ const openai = new OpenAI({
 // Get current directory for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+console.log("dirname"+ __dirname)
 
 // Load products from JSON file
 let products = [];
 
 async function loadProducts() {
   try {
-    const data = await readFile(join(__dirname, "products.json"), "utf8");
+    const data = await readFile(join(__dirname, "../backend/products.json"), "utf8");
     const productData = JSON.parse(data);
 
     // Handle both { products: [] } and direct array formats
@@ -74,7 +78,7 @@ function searchProducts(category, maxPrice, minPrice, searchTerm) {
 }
 
 // Chat endpoint
-router.post("/api/chat", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { messages } = req.body;
 
@@ -113,7 +117,7 @@ router.post("/api/chat", async (req, res) => {
     ];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",

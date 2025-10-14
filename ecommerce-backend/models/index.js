@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import  {Sequelize}  from 'sequelize';
 import sqlJsAsSqlite3 from 'sql.js-as-sqlite3';
 import fs from 'fs';
 

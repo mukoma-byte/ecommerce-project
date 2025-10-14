@@ -20,6 +20,7 @@ import { defaultOrders } from "./defaultData/defaultOrders.js";
 import fs from "fs";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chat.js"
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/cart-items", cartItemRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reset", resetRoutes);
 app.use("/api/payment-summary", paymentSummaryRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Serve static files from the dist folder
 app.use(express.static(path.join(__dirname, "dist")));
@@ -109,4 +111,8 @@ if (productCount === 0) {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(
+    "OpenAI API Key loaded:",
+    process.env.OPENAI_API_KEY ? "Yes" : "No"
+  );
 });
