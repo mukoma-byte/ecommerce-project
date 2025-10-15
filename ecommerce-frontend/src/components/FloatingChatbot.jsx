@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-
 import "./FloatingChatbot.css";
 
 // Constants
@@ -20,7 +19,6 @@ function FloatingChatbot() {
 
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -29,51 +27,39 @@ function FloatingChatbot() {
     scrollToBottom();
   }, [messages, products]);
 
-  // Message limit to prevent memory issues
   useEffect(() => {
     if (messages.length > 100) {
       setMessages((prev) => prev.slice(-50));
     }
   }, [messages.length]);
 
-  // ESC key to close chat
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.keyCode === 27 && isOpen) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("keydown", handleEscKey);
     return () => document.removeEventListener("keydown", handleEscKey);
   }, [isOpen]);
 
-  // Toggle chat visibility
-  const toggleChat = useCallback(() => {
-    setIsOpen((prev) => !prev);
-  }, []);
-
-  // Clear chat function
+  const toggleChat = useCallback(() => setIsOpen((prev) => !prev), []);
   const clearChat = useCallback(() => {
     setMessages([]);
     setProducts([]);
-    // Optional: Clear from localStorage if you're using it
     localStorage.removeItem("chatMessages");
   }, []);
 
-  // Handle suggestion clicks
   const handleSuggestionClick = useCallback((suggestion) => {
     setInput(suggestion);
   }, []);
 
-  // Handle add to cart (you can integrate with your cart system)
   const handleAddToCart = useCallback((product) => {
-    // TODO: Integrate with your cart context/state management
     console.log("Adding to cart:", product);
     alert(`Added ${product.name} to cart!`);
   }, []);
 
-  // Send message to API
+  // Updated sendMessage
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -87,37 +73,38 @@ function FloatingChatbot() {
     try {
       const response = await fetch(API_ENDPOINT, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: newMessages,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }),
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error("API quota exceeded. Try again later.");
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
 
+      // Append assistant message
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.message },
       ]);
 
-      if (data.products && data.products.length > 0) {
-        setProducts(data.products);
-      }
+      // Append products if available
+      setProducts(data.products || []);
     } catch (error) {
       console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sorry, I encountered an error. Please try again.",
+          content:
+            error.message || "Sorry, I encountered an error. Please try again.",
         },
       ]);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -135,7 +122,6 @@ function FloatingChatbot() {
         {isOpen ? "✕" : "💬"}
       </button>
 
-      {/* Chat Widget */}
       {isOpen && (
         <div
           className="floating-chat-widget"
@@ -154,7 +140,6 @@ function FloatingChatbot() {
           </div>
 
           <div className="floating-chat-body">
-            {/* Messages */}
             <div className="floating-messages-container">
               {messages.length === 0 && (
                 <div className="welcome-message">
@@ -163,21 +148,21 @@ function FloatingChatbot() {
                     products!
                   </p>
                   <div className="suggestions">
-                    {SUGGESTED_QUESTIONS.map((question, index) => (
+                    {SUGGESTED_QUESTIONS.map((q, idx) => (
                       <button
-                        key={index}
-                        onClick={() => handleSuggestionClick(question)}
+                        key={idx}
+                        onClick={() => handleSuggestionClick(q)}
                       >
-                        {question}
+                        {q}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {messages.map((msg, index) => (
+              {messages.map((msg, idx) => (
                 <div
-                  key={index}
+                  key={idx}
                   className={`floating-message ${
                     msg.role === "user" ? "user" : "assistant"
                   }`}
@@ -187,11 +172,9 @@ function FloatingChatbot() {
               ))}
 
               {loading && <div className="floating-loading">Typing...</div>}
-
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Products Display */}
             {products.length > 0 && (
               <div className="floating-products">
                 <h4>Found {products.length} product(s):</h4>
@@ -227,7 +210,6 @@ function FloatingChatbot() {
             )}
           </div>
 
-          {/* Input Form with Clear Button */}
           <form onSubmit={sendMessage} className="floating-input-form">
             <input
               type="text"
@@ -256,9 +238,5 @@ function FloatingChatbot() {
     </>
   );
 }
-
-FloatingChatbot.propTypes = {
-  // Add any props you might want to pass in the future
-};
 
 export default FloatingChatbot;
