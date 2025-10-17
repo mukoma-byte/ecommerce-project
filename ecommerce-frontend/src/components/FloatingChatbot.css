@@ -1,0 +1,403 @@
+/* FloatingChatbot.css */
+
+/* CSS Variables for consistent colors */
+:root {
+  --primary-green: rgb(8, 79, 45);
+  --primary-green-dark: rgb(6, 62, 35);
+  --primary-green-light: rgb(10, 111, 64);
+  --text-white: #ffffff;
+  --bg-light: #f9f9f9;
+  --border-light: #eee;
+}
+
+/* Toggle Button */
+.chat-toggle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--primary-green);
+  color: var(--text-white);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  /* Increased z-index */
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.chat-toggle-button:hover {
+  background-color: var(--primary-green-dark);
+  transform: scale(1.1);
+}
+
+/* Chat Widget */
+.floating-chat-widget {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 380px;
+  height: 480px;
+  /* Reduced height to be shorter than header */
+  background: var(--text-white);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  /* Higher than header's z-index */
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header - Updated Colors */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+  color: var(--text-white);
+  border-radius: 12px 12px 0 0;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--text-white);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  opacity: 0.8;
+}
+
+/* Body */
+.floating-chat-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.floating-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: var(--bg-light);
+}
+
+/* Welcome Message */
+.welcome-message {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.welcome-message p {
+  margin-bottom: 16px;
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestions button {
+  padding: 10px 16px;
+  background-color: var(--text-white);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.suggestions button:hover {
+  background-color: rgba(8, 79, 45, 0.1);
+  border-color: var(--primary-green);
+  color: var(--primary-green);
+}
+
+/* Messages - Updated Colors */
+.floating-message {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.floating-message.user {
+  background-color: var(--primary-green);
+  color: var(--text-white);
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.floating-message.assistant {
+  background-color: var(--text-white);
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-light);
+}
+
+.floating-loading {
+  padding: 10px;
+  color: #999;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Products Display */
+.floating-products {
+  padding: 12px 16px;
+  background-color: var(--text-white);
+  border-top: 1px solid var(--border-light);
+  max-height: 150px;
+  /* Reduced height */
+  overflow-y: auto;
+}
+
+.floating-products h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.floating-product-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: var(--bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.floating-product-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-green);
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-info strong {
+  font-size: 14px;
+  color: #333;
+}
+
+.product-info .price {
+  font-size: 13px;
+  color: var(--primary-green);
+  font-weight: 600;
+}
+
+.mini-add-button {
+  padding: 6px 12px;
+  background-color: var(--primary-green);
+  color: var(--text-white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.mini-add-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+/* Input Form - Updated Colors */
+.floating-input-form {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid var(--border-light);
+  background-color: var(--text-white);
+  border-radius: 0 0 12px 12px;
+}
+
+.floating-input-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  margin-right: 8px;
+  transition: border-color 0.3s;
+}
+
+.floating-input-form input:focus {
+  border-color: var(--primary-green);
+}
+
+.floating-input-form button {
+  padding: 10px 20px;
+  background-color: var(--primary-green);
+  color: var(--text-white);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.floating-input-form button:hover:not(:disabled) {
+  background-color: var(--primary-green-dark);
+}
+
+.floating-input-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Scrollbar Styling */
+.floating-messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.floating-messages-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.floating-messages-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.floating-messages-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.floating-products::-webkit-scrollbar {
+  width: 4px;
+}
+
+.floating-products::-webkit-scrollbar-thumb {
+  background: var(--primary-green);
+  border-radius: 2px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.floating-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .floating-chat-widget {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 200px);
+    /* Adjusted for mobile */
+    bottom: 90px;
+    right: 20px;
+    left: 20px;
+  }
+
+  .chat-toggle-button {
+    bottom: 16px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .floating-message {
+    max-width: 85%;
+  }
+
+  .floating-products {
+    max-height: 120px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+  .chat-toggle-button,
+  .floating-product-card,
+  .suggestions button {
+    transition: none;
+  }
+
+  .floating-chat-widget {
+    animation: none;
+  }
+
+  .floating-message {
+    animation: none;
+  }
+
+  .floating-loading {
+    animation: none;
+  }
+}

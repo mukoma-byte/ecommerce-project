@@ -1,6 +1,7 @@
 import { Header } from "../components/Header";
 import axios from "axios";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { useParams, Link } from "react-router";
 import dayjs from "dayjs";
 import './TrackingPage.css'
@@ -29,11 +30,50 @@ export function TrackingPage({cart}){
   const timePassedMs = dayjs().valueOf() - order.orderTimeMs
 
   let deliveryPercent = (timePassedMs/ totalDeliveryTimeMS) * 100
+=======
+import { useParams, Link } from "react-router-dom";
+import dayjs from "dayjs";
+import "./TrackingPage.css";
+
+export function TrackingPage({ cart }) {
+  const { orderId, productId } = useParams();
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    async function fetchTrackingPageData() {
+      const response = await axios.get(
+        `/api/orders/${orderId}?expand=products`
+      );
+      setOrder(response.data);
+    }
+    fetchTrackingPageData();
+  }, [orderId]);
+
+  if (!order) {
+    return null;
+  }
+
+  const selectedProduct = order.products.find((product) => {
+    return productId === product.productId;
+  });
+
+  const totalDeliveryTimeMS =
+    selectedProduct.estimatedDeliveryTimeMs - order.orderTimeMs;
+  const timePassedMs = dayjs().valueOf() - order.orderTimeMs;
+
+  let deliveryPercent = (timePassedMs / totalDeliveryTimeMS) * 100;
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   let isPreparing = deliveryPercent < 33;
   let isShipped = deliveryPercent >= 33 && deliveryPercent < 100;
   let isDelivered = deliveryPercent === 100;
 
+<<<<<<< HEAD
   if (deliveryPercent > 100){deliveryPercent = 100}
+=======
+  if (deliveryPercent > 100) {
+    deliveryPercent = 100;
+  }
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   return (
     <>
       <title>Tracking</title>
@@ -87,4 +127,8 @@ export function TrackingPage({cart}){
       </div>
     </>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b

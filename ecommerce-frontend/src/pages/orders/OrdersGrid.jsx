@@ -1,14 +1,23 @@
 import dayjs from "dayjs";
 import axios from "axios";
 import { formatMoney } from "../../utils/money";
+<<<<<<< HEAD
 import BuyAgainIcon from "../../assets/images/icons/buy-again.png"
 import { Fragment } from "react";
 import { Link } from "react-router";
+=======
+import BuyAgainIcon from "../../assets/images/icons/buy-again.png";
+import { Fragment } from "react";
+import { Link } from "react-router-dom";
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 export function OrdersGrid({ orders, loadCart }) {
   return (
     <div className="orders-grid">
       {orders.map((order) => {
+<<<<<<< HEAD
       
+=======
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
         return (
           <div key={order.id} className="order-container">
             <div className="order-header">
@@ -30,6 +39,7 @@ export function OrdersGrid({ orders, loadCart }) {
             </div>
             <div className="order-details-grid">
               {order.products.map((orderProduct) => {
+<<<<<<< HEAD
                   const addToCart = async() => {
                     await axios.post("/api/cart-items", {
                       productId: orderProduct.productId,
@@ -38,6 +48,16 @@ export function OrdersGrid({ orders, loadCart }) {
 
                     await loadCart();
                   }; 
+=======
+                const addToCart = async () => {
+                  await axios.post("/api/cart-items", {
+                    productId: orderProduct.productId,
+                    quantity: orderProduct.quantity,
+                  });
+
+                  await loadCart();
+                };
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
                 return (
                   <Fragment key={orderProduct.productId}>
                     <div className="product-image-container">
@@ -57,7 +77,13 @@ export function OrdersGrid({ orders, loadCart }) {
                       </div>
                       <button className="buy-again-button button-primary">
                         <img className="buy-again-icon" src={BuyAgainIcon} />
+<<<<<<< HEAD
                         <span className="buy-again-message" onClick={addToCart}>Add to Cart</span>
+=======
+                        <span className="buy-again-message" onClick={addToCart}>
+                          Add to Cart
+                        </span>
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
                       </button>
                     </div>
 
@@ -79,4 +105,8 @@ export function OrdersGrid({ orders, loadCart }) {
       })}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b

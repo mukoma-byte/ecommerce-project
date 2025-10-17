@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -18,6 +19,33 @@ import { defaultDeliveryOptions } from './defaultData/defaultDeliveryOptions.js'
 import { defaultCart } from './defaultData/defaultCart.js';
 import { defaultOrders } from './defaultData/defaultOrders.js';
 import fs from 'fs';
+=======
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { sequelize } from "./models/index.js";
+import productRoutes from "./routes/products.js";
+import deliveryOptionRoutes from "./routes/deliveryOptions.js";
+import cartItemRoutes from "./routes/cartItems.js";
+import orderRoutes from "./routes/orders.js";
+import resetRoutes from "./routes/reset.js";
+import paymentSummaryRoutes from "./routes/paymentSummary.js";
+import { Product } from "./models/Product.js";
+import { DeliveryOption } from "./models/DeliveryOption.js";
+import { CartItem } from "./models/CartItem.js";
+import { Order } from "./models/Order.js";
+import { defaultProducts } from "./defaultData/defaultProducts.js";
+import { defaultDeliveryOptions } from "./defaultData/defaultDeliveryOptions.js";
+import { defaultCart } from "./defaultData/defaultCart.js";
+import { defaultOrders } from "./defaultData/defaultOrders.js";
+import fs from "fs";
+import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chat.js"
+
+dotenv.config();
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +57,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve images from the images folder
+<<<<<<< HEAD
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Use routes
@@ -49,6 +78,30 @@ app.get('*', (req, res) => {
     res.sendFile(indexPath);
   } else {
     res.status(404).send('index.html not found');
+=======
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+// Use routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/delivery-options", deliveryOptionRoutes);
+app.use("/api/cart-items", cartItemRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reset", resetRoutes);
+app.use("/api/payment-summary", paymentSummaryRoutes);
+app.use("/api/chat", chatRoutes);
+
+// Serve static files from the dist folder
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Catch-all route to serve index.html for any unmatched routes
+app.get("*", (req, res) => {
+  const indexPath = path.join(__dirname, "dist", "index.html");
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send("index.html not found");
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   }
 });
 
@@ -56,7 +109,11 @@ app.get('*', (req, res) => {
 /* eslint-disable no-unused-vars */
 app.use((err, req, res, next) => {
   console.error(err.stack);
+<<<<<<< HEAD
   res.status(500).json({ error: 'Something went wrong!' });
+=======
+  res.status(500).json({ error: "Something went wrong!" });
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 });
 /* eslint-enable no-unused-vars */
 
@@ -70,6 +127,7 @@ if (productCount === 0) {
   const productsWithTimestamps = defaultProducts.map((product, index) => ({
     ...product,
     createdAt: new Date(timestamp + index),
+<<<<<<< HEAD
     updatedAt: new Date(timestamp + index)
   }));
 
@@ -78,17 +136,37 @@ if (productCount === 0) {
     createdAt: new Date(timestamp + index),
     updatedAt: new Date(timestamp + index)
   }));
+=======
+    updatedAt: new Date(timestamp + index),
+  }));
+
+  const deliveryOptionsWithTimestamps = defaultDeliveryOptions.map(
+    (option, index) => ({
+      ...option,
+      createdAt: new Date(timestamp + index),
+      updatedAt: new Date(timestamp + index),
+    })
+  );
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 
   const cartItemsWithTimestamps = defaultCart.map((item, index) => ({
     ...item,
     createdAt: new Date(timestamp + index),
+<<<<<<< HEAD
     updatedAt: new Date(timestamp + index)
+=======
+    updatedAt: new Date(timestamp + index),
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   }));
 
   const ordersWithTimestamps = defaultOrders.map((order, index) => ({
     ...order,
     createdAt: new Date(timestamp + index),
+<<<<<<< HEAD
     updatedAt: new Date(timestamp + index)
+=======
+    updatedAt: new Date(timestamp + index),
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   }));
 
   await Product.bulkCreate(productsWithTimestamps);
@@ -96,10 +174,21 @@ if (productCount === 0) {
   await CartItem.bulkCreate(cartItemsWithTimestamps);
   await Order.bulkCreate(ordersWithTimestamps);
 
+<<<<<<< HEAD
   console.log('Default data added to the database.');
+=======
+  console.log("Default data added to the database.");
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 }
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+<<<<<<< HEAD
+=======
+  console.log(
+    "OpenAI API Key loaded:",
+    process.env.OPENAI_API_KEY ? "Yes" : "No"
+  );
+>>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
 });
