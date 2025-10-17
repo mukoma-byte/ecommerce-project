@@ -1,15 +1,5 @@
 import { formatMoney } from "../../utils/money";
 import axios from "axios";
-<<<<<<< HEAD
-import { useNavigate } from "react-router";
-export function PaymentSummary({ paymentSummary, loadCart }) {
-  const navigate = useNavigate()
-
-  const createOrder = async () => {
-    await axios.post("/api/orders");
-    await loadCart()
-    navigate("/orders")
-=======
 import { useNavigate } from "react-router-dom";
 export function PaymentSummary({ paymentSummary, loadCart }) {
   const navigate = useNavigate();
@@ -18,7 +8,6 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
     await axios.post("/api/orders");
     await loadCart();
     navigate("/orders");
->>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   };
   /*Here there is a create order function that runs when place order is clicked...we use the post request to the backend which clears the cart to act like we actually sent a request and it also creates an order*/
   return (
@@ -69,8 +58,4 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
       </button>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
