@@ -21,13 +21,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
-<<<<<<< HEAD
-    "patch-package": "8.0.0",
-    "pg": "^8.16.0",
-    "sequelize": "^6.6.5",
-    "sql.js": "1.10.3",
-    "sql.js-as-sqlite3": "0.2.1"
-=======
+
     "openai": "^6.3.0",
     "patch-package": "^8.0.1",
     "pg": "^8.16.0",
@@ -36,7 +30,7 @@
     "sql.js-as-sqlite3": "0.2.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
->>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
+
   },
   "devDependencies": {
     "archiver": "^7.0.1",
