@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import { Link } from "react-router";
-import CheckoutLockIcon from "../../assets/images/icons/checkout-lock-icon.png";
-import Logo from "../../assets/images/logo.png";
-import MobileLogo from "../../assets/images/mobile-logo.png";
-import './CheckoutHeader.css';
-
-export function CheckoutHeader({cart}){
-  let totalItems = 0
-  cart.forEach(cartItem => {
-    totalItems += cartItem.quantity
-=======
 import { Link } from "react-router-dom";
 import CheckoutLockIcon from "../../assets/images/icons/checkout-lock-icon.png";
 import Logo from "../../assets/images/logo.png";
@@ -20,7 +8,6 @@ export function CheckoutHeader({ cart }) {
   let totalItems = 0;
   cart.forEach((cartItem) => {
     totalItems += cartItem.quantity;
->>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
   });
   return (
     <div className="checkout-header">
@@ -46,8 +33,4 @@ export function CheckoutHeader({ cart }) {
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> cccf6bf20d87a1e1fdd9bd0b9bc60db31664a12b
