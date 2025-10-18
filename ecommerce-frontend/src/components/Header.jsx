@@ -30,12 +30,12 @@ export function Header({ cart }) {
       {/* Left Section */}
       <div className="left-section">
         <NavLink to="/" className="header-link logo-link">
-          <img className="logo" src={LogoWhiteIcon} alt="Logo" />
-          <img
-            className="mobile-logo"
-            src={MobileLogoWhiteIcon}
-            alt="Mobile Logo"
-          />
+          <div
+            className="leckerli-one-regular"
+            style={{ fontFamily: "'Leckerli One', cursive" }}
+          >
+            🏷️Peter-Mukoma Shop
+          </div>
         </NavLink>
 
         {/* Hamburger Menu (visible only on mobile) */}
