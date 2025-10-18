@@ -20,10 +20,9 @@ import { defaultOrders } from "./defaultData/defaultOrders.js";
 import fs from "fs";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
-import chatRoutes from "./routes/chat.js"
+import chatRoutes from "./routes/chat.js";
 
 dotenv.config();
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
