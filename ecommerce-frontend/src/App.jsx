@@ -31,12 +31,15 @@ function App() {
     <>
       <Routes>
         <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
-        <Route path="checkout" element={<CheckoutPage cart={cart} />} />
+        <Route
+          path="checkout"
+          element={<CheckoutPage cart={cart} loadCart={loadCart} />}
+        />
         <Route
           path="orders"
           element={
             <ProtectedRoute>
-              <OrdersPage cart={cart} />
+              <OrdersPage cart={cart} loadCart={loadCart} />
             </ProtectedRoute>
           }
         />

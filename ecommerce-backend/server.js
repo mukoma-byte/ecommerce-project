@@ -20,7 +20,7 @@ import { defaultOrders } from "./defaultData/defaultOrders.js";
 import fs from "fs";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
-import chatRoutes from "./routes/chat.js"
+import chatRoutes from "./routes/chat.js";
 
 dotenv.config();
 

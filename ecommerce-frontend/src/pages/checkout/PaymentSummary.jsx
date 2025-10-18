@@ -9,6 +9,7 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
     await loadCart();
     navigate("/orders");
   };
+  
   /*Here there is a create order function that runs when place order is clicked...we use the post request to the backend which clears the cart to act like we actually sent a request and it also creates an order*/
   return (
     <div className="payment-summary" data-testid="payment-summary">
