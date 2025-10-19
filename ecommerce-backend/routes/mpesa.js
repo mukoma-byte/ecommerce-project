@@ -325,5 +325,50 @@ router.get("/history/:orderId", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+router.post("/complete-payment/:checkoutRequestId", async (req, res) => {
+  try {
+    console.log("\n" + "=".repeat(50));
+    console.log("🧪 MANUAL PAYMENT COMPLETION");
+    console.log("=".repeat(50));
 
+    const { checkoutRequestId } = req.params;
+
+    if (!checkoutRequestId) {
+      return res.status(400).json({ error: "checkoutRequestId required" });
+    }
+
+    console.log("Finding payment for:", checkoutRequestId);
+
+    // Find the payment
+    const payment = await db.get(
+      `SELECT * FROM payments WHERE checkout_request_id = ?`,
+      [checkoutRequestId]
+    );
+
+    if (!payment) {
+      console.log("❌ Payment not found:", checkoutRequestId);
+      return res.status(404).json({ error: "Payment not found" });
+    }
+
+    console.log("✅ Payment found:", payment);
+
+    // Update to success
+    await db.run(
+      `UPDATE payments SET status = ? WHERE checkout_request_id = ?`,
+      ["success", checkoutRequestId]
+    );
+
+    console.log("✅ Payment marked as SUCCESS");
+    console.log("=".repeat(50) + "\n");
+
+    res.json({
+      message: "Payment completed successfully",
+      orderId: payment.order_id,
+      status: "success",
+    });
+  } catch (error) {
+    console.error("❌ Error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 export default router;
