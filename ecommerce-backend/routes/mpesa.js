@@ -1,12 +1,12 @@
-// routes/mpesa.js
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
+import { db } from "../db.js";
 
 dotenv.config();
 const router = express.Router();
 
-// Generate M-Pesa access token
+// Helper: get M-Pesa access token
 async function getAccessToken() {
   const auth = Buffer.from(
     `${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`
@@ -18,26 +18,30 @@ async function getAccessToken() {
       headers: { Authorization: `Basic ${auth}` },
     }
   );
+
   return response.data.access_token;
 }
 
-// STK Push simulation
+// 🟢 STK Push initiation
 router.post("/stkpush", async (req, res) => {
   try {
-    const { phone, amount, orderId } = req.body;
+    const { phone, amount, orderId, userId } = req.body;
     const token = await getAccessToken();
+
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[^0-9]/g, "")
+      .slice(0, 14);
+    const password = Buffer.from(
+      `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`
+    ).toString("base64");
 
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
         BusinessShortCode: process.env.MPESA_SHORTCODE,
-        Password: Buffer.from(
-          `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${new Date()
-            .toISOString()
-            .replace(/[^0-9]/g, "")
-            .slice(0, 14)}`
-        ).toString("base64"),
-        Timestamp: new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14),
+        Password: password,
+        Timestamp: timestamp,
         TransactionType: "CustomerPayBillOnline",
         Amount: amount,
         PartyA: phone,
@@ -50,12 +54,18 @@ router.post("/stkpush", async (req, res) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    // Store initial payment attempt
-    // Save { orderId, userId, status: 'pending' } in SQLite
+    const checkoutRequestID = response.data.CheckoutRequestID;
+
+    // Save payment as pending
+    await db.run(
+      `INSERT INTO payments (user_id, order_id, amount, status, checkout_request_id)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, orderId, amount, "pending", checkoutRequestID]
+    );
 
     res.json({
       message: "STK push initiated. Complete payment on your phone.",
-      checkoutRequestID: response.data.CheckoutRequestID,
+      checkoutRequestID,
     });
   } catch (err) {
     console.error(err.response?.data || err.message);
@@ -63,19 +73,66 @@ router.post("/stkpush", async (req, res) => {
   }
 });
 
-// Callback from M-Pesa
+// 🟢 Callback from M-Pesa
 router.post("/callback", async (req, res) => {
-  const result = req.body.Body.stkCallback;
+  try {
+    const result = req.body.Body.stkCallback;
+    console.log(
+      "📩 M-Pesa Callback Received:",
+      JSON.stringify(result, null, 2)
+    );
 
-  if (result.ResultCode === 0) {
-    const { CheckoutRequestID, CallbackMetadata } = result;
-    const amount = CallbackMetadata.Item.find(i => i.Name === "Amount").Value;
-    const phone = CallbackMetadata.Item.find(i => i.Name === "PhoneNumber").Value;
+    if (result.ResultCode === 0) {
+      const { CheckoutRequestID, CallbackMetadata } = result;
+      const amount = CallbackMetadata.Item.find(
+        (i) => i.Name === "Amount"
+      ).Value;
 
-    // Update SQLite: mark payment as successful
+      // Mark payment as success
+      await db.run(
+        `UPDATE payments
+         SET status = ?, amount = ?
+         WHERE checkout_request_id = ?`,
+        ["success", amount, CheckoutRequestID]
+      );
+
+      console.log("✅ Payment marked successful:", CheckoutRequestID);
+    } else {
+      await db.run(
+        `UPDATE payments
+         SET status = ?
+         WHERE checkout_request_id = ?`,
+        ["failed", result.CheckoutRequestID]
+      );
+
+      console.log("❌ Payment failed:", result.CheckoutRequestID);
+    }
+
+    res.json({ message: "Callback received successfully" });
+  } catch (error) {
+    console.error("Callback error:", error.message);
+    res.status(500).json({ error: "Callback processing failed" });
   }
+});
 
-  res.json({ message: "Callback received successfully" });
+// 🟢 Payment status endpoint
+router.get("/status/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const payment = await db.get(
+      `SELECT status FROM payments
+       WHERE order_id = ?
+       ORDER BY id DESC
+       LIMIT 1`,
+      [orderId]
+    );
+
+    res.json(payment?.status || "pending");
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
 export default router;
