@@ -11,11 +11,16 @@ export function PaymentProcessing() {
   const [attempts, setAttempts] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
 
-  const MAX_ATTEMPTS = 75; // 75 polls × 4 sec = 5 minutes
-  const POLL_INTERVAL = 4000; // 4 seconds
-  const TIMEOUT_SECONDS = 300; // 5 minutes in seconds
+  const MAX_ATTEMPTS = 75;
+  const POLL_INTERVAL = 4000;
+  const TIMEOUT_SECONDS = 300;
 
   useEffect(() => {
+    // Don't start polling if we already have a result
+    if (status !== "pending") {
+      return;
+    }
+
     // Check if max attempts reached
     if (attempts >= MAX_ATTEMPTS) {
       setStatus("timeout");
@@ -27,38 +32,35 @@ export function PaymentProcessing() {
       return;
     }
 
-    const interval = setInterval(async () => {
-      setAttempts((prev) => prev + 1);
-      setTimeElapsed((prev) => prev + 4);
-
+    // First check immediately (don't wait 4 seconds)
+    const checkPaymentStatus = async () => {
       try {
         const verify = await axios.get(`/api/pay/status/${orderId}`, {
-          timeout: 5000, // 5 second timeout per request
+          timeout: 5000,
         });
 
         const { status: paymentStatus } = verify.data;
 
         if (paymentStatus === "success") {
-          clearInterval(interval);
           setStatus("success");
-          // Redirect after showing success message
           setTimeout(() => navigate("/orders"), 1500);
+          return true;
         } else if (paymentStatus === "failed") {
-          clearInterval(interval);
           setStatus("failed");
           setError(
             "Payment was declined. Please try again or use a different payment method."
           );
+          return true;
         }
       } catch (error) {
         console.error("Error checking payment status:", error);
 
-        // Distinguish between different error types
         if (error.code === "ECONNABORTED") {
           setError("Request timeout. Retrying...");
         } else if (error.response?.status === 404) {
           setError("Order not found. Please verify your order ID.");
           setStatus("error");
+          return true;
         } else if (error.response?.status === 500) {
           setError("Server error. Retrying...");
         } else if (!error.response) {
@@ -67,10 +69,24 @@ export function PaymentProcessing() {
           setError("Failed to check payment status. Retrying...");
         }
       }
+      return false;
+    };
+
+    // Check immediately on first mount
+    if (attempts === 0) {
+      checkPaymentStatus();
+    }
+
+    // Then set up interval for subsequent checks
+    const interval = setInterval(async () => {
+      setAttempts((prev) => prev + 1);
+      setTimeElapsed((prev) => prev + 4);
+
+      await checkPaymentStatus();
     }, POLL_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [attempts, orderId, navigate]);
+  }, [orderId, navigate]); // Only depend on orderId and navigate - NOT attempts or status
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
