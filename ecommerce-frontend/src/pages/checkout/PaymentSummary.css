@@ -1,0 +1,25 @@
+.phone-input-container {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.phone-label {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.phone-input {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: all 0.2s ease;
+}
+
+.phone-input:focus {
+  border-color: #2a9d8f;
+  outline: none;
+  box-shadow: 0 0 3px rgba(42, 157, 143, 0.3);
+}

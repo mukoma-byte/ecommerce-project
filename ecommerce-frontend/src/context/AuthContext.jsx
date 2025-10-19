@@ -20,15 +20,23 @@ export function AuthProvider({ children }) {
       email,
       password,
     });
-    localStorage.setItem("user", JSON.stringify(res.data));
-    setUser(res.data);
+      const { token, ...user } = res.data;
+
+      if (token) localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setUser(user);
   };
 
   // Login
   const login = async (email, password) => {
     const res = await axios.post("/api/auth/login", { email, password });
-    localStorage.setItem("user", JSON.stringify(res.data));
-    setUser(res.data);
+
+    const { token, ...user } = res.data;
+     localStorage.setItem("token", token);
+     localStorage.setItem("user", JSON.stringify(user));
+
+     setUser(user);
   };
 
   // Logout

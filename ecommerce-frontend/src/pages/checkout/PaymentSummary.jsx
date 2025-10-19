@@ -1,10 +1,12 @@
 import { formatMoney } from "../../utils/money";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import "./PaymentSummary.css";
 
 export function PaymentSummary({ paymentSummary, }) {
   const navigate = useNavigate();
-  const [isPaying] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
+  const [phone, setPhone] = useState("");
 
   const handlePlaceOrder = async () => {
     try {
@@ -17,6 +19,23 @@ export function PaymentSummary({ paymentSummary, }) {
         return;
       }
 
+      // ✅ Validate phone format
+      let formattedPhone = phone.trim();
+      if (formattedPhone.startsWith("0")) {
+        formattedPhone = "254" + formattedPhone.substring(1); // e.g., 07 → 2547
+      } else if (formattedPhone.startsWith("+")) {
+        formattedPhone = formattedPhone.substring(1);
+      }
+
+      if (!/^2547\d{8}$/.test(formattedPhone)) {
+        alert(
+          "Enter a valid phone number in the format 07XXXXXXXX or 2547XXXXXXXX."
+        );
+        return;
+      }
+
+      setIsPaying(true);
+
       const res = await fetch("/api/pay/stkpush", {
         method: "POST",
         headers: {
@@ -24,18 +43,23 @@ export function PaymentSummary({ paymentSummary, }) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          phone: user.phone, // user’s M-Pesa number
-          amount: paymentSummary.totalCostCents / 100,
+          phone: formattedPhone, // user’s M-Pesa number
+          amount: Math.round(paymentSummary.totalCostCents / 100),
           userId: user.id,
         }),
       });
 
       const data = await res.json();
+      setIsPaying(false);
 
-      alert(data.message || "Please confirm the payment on your phone.");
-
-      navigate(`/payment-processing/${data.orderId}`);
+      if (res.ok) {
+        alert(data.message || "Please confirm the payment on your phone.");
+        navigate(`/payment-processing/${data.orderId}`);
+      } else {
+        alert(data.error || "Failed to initiate payment.");
+      };
     } catch (err) {
+      setIsPaying(false);
       console.error(err);
       alert("Failed to start payment. Try again.");
     }
@@ -72,6 +96,21 @@ export function PaymentSummary({ paymentSummary, }) {
         <div className="payment-summary-money">
           {formatMoney(paymentSummary.taxCents)}
         </div>
+      </div>
+
+      {/* PHONE NUMBER INPUT */}
+      <div className="phone-input-container">
+        <label htmlFor="phone" className="phone-label">
+          M-Pesa Phone Number:
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="e.g. 0712345678"
+          className="phone-input"
+        />
       </div>
 
       <div className="payment-summary-row total-row">

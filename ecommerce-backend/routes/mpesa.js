@@ -36,6 +36,11 @@ router.post("/stkpush", async (req, res) => {
       `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`
     ).toString("base64");
 
+    console.log("STK push payload:", {
+      Amount: parseInt(amount, 10),
+      PhoneNumber: phone,
+    });
+    
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
@@ -43,7 +48,7 @@ router.post("/stkpush", async (req, res) => {
         Password: password,
         Timestamp: timestamp,
         TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
+        Amount: parseInt(amount, 10),
         PartyA: phone,
         PartyB: process.env.MPESA_SHORTCODE,
         PhoneNumber: phone,
