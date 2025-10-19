@@ -55,6 +55,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="tracking/:orderId/:productId" element={<TrackingPage />} />
+       
         <Route path="profile" element={<Profile />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
