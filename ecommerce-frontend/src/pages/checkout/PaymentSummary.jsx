@@ -1,16 +1,73 @@
 import { formatMoney } from "../../utils/money";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-export function PaymentSummary({ paymentSummary, loadCart }) {
-  const navigate = useNavigate();
+import { useState } from "react";
 
-  const createOrder = async () => {
-    await axios.post("/api/orders");
-    await loadCart();
-    navigate("/orders");
+export function PaymentSummary({ paymentSummary, loadCart, user, token }) {
+  const navigate = useNavigate();
+  const [isPaying, setIsPaying] = useState(false);
+
+  const handlePlaceOrder = async () => {
+    try {
+      setIsPaying(true);
+
+      // 1️⃣ Create the order first
+      const orderRes = await axios.post(
+        "/api/orders",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const order = orderRes.data; // assuming backend returns the new order
+      const totalPrice = paymentSummary.totalCostCents / 100; // convert from cents to KES
+
+      // 2️⃣ Trigger STK Push
+      const payRes = await fetch("/api/pay/stkpush", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          phone: user.phone,
+          amount: totalPrice,
+          orderId: order.id,
+          userId: user.id,
+        }),
+      });
+
+      const data = await payRes.json();
+      alert(
+        data.message || "STK Push initiated. Please confirm on your phone."
+      );
+
+      // 3️⃣ Poll backend for payment status
+      const interval = setInterval(async () => {
+        try {
+          const verify = await fetch(`/api/pay/status/${order.id}`);
+          const status = await verify.json();
+
+          if (status === "success") {
+            clearInterval(interval);
+            await loadCart(); // refresh cart after payment
+            navigate("/orders");
+          }
+        } catch (err) {
+          console.error("Polling error:", err);
+        }
+      }, 4000);
+    } catch (error) {
+      console.error("Payment failed:", error);
+      alert("Payment initiation failed. Please try again.");
+    } finally {
+      setIsPaying(false);
+    }
   };
-  
-  /*Here there is a create order function that runs when place order is clicked...we use the post request to the backend which clears the cart to act like we actually sent a request and it also creates an order*/
+
   return (
     <div className="payment-summary" data-testid="payment-summary">
       <div className="payment-summary-title">Payment Summary</div>
@@ -53,9 +110,10 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
       <button
         className="place-order-button button-primary"
         data-testid="place-order-btn"
-        onClick={createOrder}
+        onClick={handlePlaceOrder}
+        disabled={isPaying}
       >
-        Place your order
+        {isPaying ? "Processing..." : "Place your order"}
       </button>
     </div>
   );
