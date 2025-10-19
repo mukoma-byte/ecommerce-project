@@ -26,6 +26,21 @@ async function getAccessToken() {
 router.post("/stkpush", async (req, res) => {
   try {
     const { phone, amount, orderId, userId } = req.body;
+
+    // ✅ Validate required fields
+    if (!phone || !amount || !orderId || !userId) {
+      return res.status(400).json({
+        error: "Missing required fields: phone, amount, orderId, userId",
+      });
+    }
+
+    // ✅ Validate amount is positive
+    if (amount <= 0) {
+      return res.status(400).json({
+        error: "Amount must be greater than 0",
+      });
+    }
+
     const token = await getAccessToken();
 
     const timestamp = new Date()
@@ -39,8 +54,9 @@ router.post("/stkpush", async (req, res) => {
     console.log("STK push payload:", {
       Amount: parseInt(amount, 10),
       PhoneNumber: phone,
+      OrderId: orderId,
     });
-    
+
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
@@ -68,13 +84,17 @@ router.post("/stkpush", async (req, res) => {
       [userId, orderId, amount, "pending", checkoutRequestID]
     );
 
+    // ✅ Return consistent response with both orderId and checkoutRequestID
     res.json({
-      message: "STK push initiated. Complete payment on your phone.",
-      checkoutRequestID,
+      message: "STK push initiated. Please complete the payment on your phone.",
+      orderId: orderId, // ✅ For navigation
+      checkoutRequestID: checkoutRequestID, // ✅ For reference
     });
   } catch (err) {
-    console.error(err.response?.data || err.message);
-    res.status(500).json({ error: "STK Push failed" });
+    console.error("STK Push error:", err.response?.data || err.message);
+    res.status(500).json({
+      error: err.response?.data?.error || "STK Push failed. Please try again.",
+    });
   }
 });
 
@@ -88,6 +108,7 @@ router.post("/callback", async (req, res) => {
     );
 
     if (result.ResultCode === 0) {
+      // ✅ Payment successful
       const { CheckoutRequestID, CallbackMetadata } = result;
       const amount = CallbackMetadata.Item.find(
         (i) => i.Name === "Amount"
@@ -103,6 +124,7 @@ router.post("/callback", async (req, res) => {
 
       console.log("✅ Payment marked successful:", CheckoutRequestID);
     } else {
+      // ✅ Payment failed
       await db.run(
         `UPDATE payments
          SET status = ?
@@ -113,6 +135,7 @@ router.post("/callback", async (req, res) => {
       console.log("❌ Payment failed:", result.CheckoutRequestID);
     }
 
+    // ✅ Always respond with success to acknowledge callback
     res.json({ message: "Callback received successfully" });
   } catch (error) {
     console.error("Callback error:", error.message);
@@ -125,6 +148,10 @@ router.get("/status/:orderId", async (req, res) => {
   try {
     const { orderId } = req.params;
 
+    if (!orderId) {
+      return res.status(400).json({ error: "orderId is required" });
+    }
+
     const payment = await db.get(
       `SELECT status FROM payments
        WHERE order_id = ?
@@ -133,9 +160,40 @@ router.get("/status/:orderId", async (req, res) => {
       [orderId]
     );
 
-    res.json(payment?.status || "pending");
+    // ✅ Return consistent response format
+    if (!payment) {
+      return res.status(404).json({
+        error: "Payment not found for this order",
+        status: "pending", // Default to pending if not found
+      });
+    }
+
+    res.json({
+      status: payment.status,
+      orderId: orderId,
+    });
   } catch (error) {
-    console.error(error.message);
+    console.error("Status check error:", error.message);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// 🟢 Payment history for an order (optional, for debugging)
+router.get("/history/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const payments = await db.all(
+      `SELECT id, user_id, amount, status, checkout_request_id, createdAt
+       FROM payments
+       WHERE order_id = ?
+       ORDER BY id DESC`,
+      [orderId]
+    );
+
+    res.json(payments || []);
+  } catch (error) {
+    console.error("Payment history error:", error.message);
     res.status(500).json({ error: "Database error" });
   }
 });
