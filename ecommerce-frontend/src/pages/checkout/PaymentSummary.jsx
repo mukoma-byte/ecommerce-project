@@ -1,72 +1,46 @@
 import { formatMoney } from "../../utils/money";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export function PaymentSummary({ paymentSummary, loadCart, user, token }) {
+export function PaymentSummary({ paymentSummary, }) {
   const navigate = useNavigate();
-  const [isPaying, setIsPaying] = useState(false);
+  const [isPaying] = useState(false);
 
   const handlePlaceOrder = async () => {
     try {
-      setIsPaying(true);
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
 
-      // 1️⃣ Create the order first
-      const orderRes = await axios.post(
-        "/api/orders",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (!user || !token) {
+        alert("You must be logged in to place an order.");
+        navigate("/login");
+        return;
+      }
 
-      const order = orderRes.data; // assuming backend returns the new order
-      const totalPrice = paymentSummary.totalCostCents / 100; // convert from cents to KES
-
-      // 2️⃣ Trigger STK Push
-      const payRes = await fetch("/api/pay/stkpush", {
+      const res = await fetch("/api/pay/stkpush", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          phone: user.phone,
-          amount: totalPrice,
-          orderId: order.id,
+          phone: user.phone, // user’s M-Pesa number
+          amount: paymentSummary.totalCostCents / 100,
           userId: user.id,
         }),
       });
 
-      const data = await payRes.json();
-      alert(
-        data.message || "STK Push initiated. Please confirm on your phone."
-      );
+      const data = await res.json();
 
-      // 3️⃣ Poll backend for payment status
-      const interval = setInterval(async () => {
-        try {
-          const verify = await fetch(`/api/pay/status/${order.id}`);
-          const status = await verify.json();
+      alert(data.message || "Please confirm the payment on your phone.");
 
-          if (status === "success") {
-            clearInterval(interval);
-            await loadCart(); // refresh cart after payment
-            navigate("/orders");
-          }
-        } catch (err) {
-          console.error("Polling error:", err);
-        }
-      }, 4000);
-    } catch (error) {
-      console.error("Payment failed:", error);
-      alert("Payment initiation failed. Please try again.");
-    } finally {
-      setIsPaying(false);
+      navigate(`/payment-processing/${data.orderId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start payment. Try again.");
     }
   };
+
 
   return (
     <div className="payment-summary" data-testid="payment-summary">

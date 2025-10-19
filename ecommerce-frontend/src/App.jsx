@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { HomePage } from "./pages/home/HomePage";
 import { CheckoutPage } from "./pages/checkout/CheckoutPage";
+import { PaymentProcessing } from "./components/PaymentProcessing";
 import { OrdersPage } from "./pages/orders/OrdersPage";
 import { TrackingPage } from "./pages/TrackingPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -34,6 +35,14 @@ function App() {
         <Route
           path="checkout"
           element={<CheckoutPage cart={cart} loadCart={loadCart} />}
+        />
+        <Route
+          path="payment-processing/:orderId"
+          element={
+            <ProtectedRoute>
+              <PaymentProcessing />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="orders"

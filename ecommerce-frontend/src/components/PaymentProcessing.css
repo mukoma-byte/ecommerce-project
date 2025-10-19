@@ -1,0 +1,75 @@
+.payment-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: #f8fafc;
+  color: #333;
+  font-family: "Inter", system-ui, sans-serif;
+  padding: 1rem;
+}
+
+/* Loader spinner */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #d1d5db;
+  /* light gray */
+  border-top: 5px solid #007bff;
+  /* blue */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Text styles */
+.waiting-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.instructions {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.failed-text {
+  color: #dc2626;
+  /* red */
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.success-text {
+  color: #16a34a;
+  /* green */
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Fade-in effect for smooth appearance */
+.payment-processing {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
