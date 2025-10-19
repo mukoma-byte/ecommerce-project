@@ -21,6 +21,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chat.js";
+import mpesaRoutes from "./routes/mpesa.js";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reset", resetRoutes);
 app.use("/api/payment-summary", paymentSummaryRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/pay", mpesaRoutes);
 
 // Serve static files from the dist folder
 app.use(express.static(path.join(__dirname, "dist")));
