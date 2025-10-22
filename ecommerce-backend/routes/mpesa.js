@@ -44,79 +44,6 @@ router.get("/test-db", async (req, res) => {
     });
   }
 });
-// 🟢 STK Push initiation
-router.post("/callback", async (req, res) => {
-  try {
-    console.log("\n" + "=".repeat(50));
-    console.log("📩 M-PESA CALLBACK RECEIVED");
-    console.log("=".repeat(50));
-    console.log("Full request body:", JSON.stringify(req.body, null, 2));
-
-    const result = req.body.Body.stkCallback;
-    console.log("\nCallback Result:", {
-      ResultCode: result.ResultCode,
-      ResultDesc: result.ResultDesc,
-      CheckoutRequestID: result.CheckoutRequestID,
-      MerchantRequestID: result.MerchantRequestID,
-    });
-
-    if (result.ResultCode === 0) {
-      // ✅ Payment successful
-      console.log("\n✅ PAYMENT SUCCESSFUL");
-
-      const { CheckoutRequestID, CallbackMetadata } = result;
-      const amount = CallbackMetadata.Item.find(
-        (i) => i.Name === "Amount"
-      )?.Value;
-
-      console.log("Updating payment with:", {
-        checkoutRequestId: CheckoutRequestID,
-        amount: amount,
-        newStatus: "success",
-      });
-
-      const updateResult = await db.run(
-        `UPDATE payments
-         SET status = ?, amount = ?
-         WHERE checkout_request_id = ?`,
-        ["success", amount, CheckoutRequestID]
-      );
-
-      console.log("✅ Payment marked as SUCCESS in database");
-      console.log("Update result:", updateResult);
-
-      // Verify update
-      const verifyPayment = await db.get(
-        `SELECT * FROM payments WHERE checkout_request_id = ?`,
-        [CheckoutRequestID]
-      );
-      console.log("✅ Verification - Updated payment:", verifyPayment);
-    } else {
-      // ❌ Payment failed
-      console.log("\n❌ PAYMENT FAILED");
-      console.log("Result Code:", result.ResultCode);
-      console.log("Result Description:", result.ResultDesc);
-
-      const updateResult = await db.run(
-        `UPDATE payments
-         SET status = ?
-         WHERE checkout_request_id = ?`,
-        ["failed", result.CheckoutRequestID]
-      );
-
-      console.log("❌ Payment marked as FAILED in database");
-      console.log("Update result:", updateResult);
-    }
-
-    console.log("=".repeat(50) + "\n");
-    res.json({ message: "Callback received successfully" });
-  } catch (error) {
-    console.error("\n❌ CALLBACK ERROR:");
-    console.error(error);
-    console.log("=".repeat(50) + "\n");
-    res.status(500).json({ error: "Callback processing failed" });
-  }
-});
 
 // 🔍 STK Push with enhanced logging
 router.post("/stkpush", async (req, res) => {
@@ -218,50 +145,81 @@ router.post("/stkpush", async (req, res) => {
   }
 });
 
-// 🟢 Callback from M-Pesa
+// 🟢 STK Push initiation
 router.post("/callback", async (req, res) => {
   try {
+    console.log("\n" + "=".repeat(50));
+    console.log("📩 M-PESA CALLBACK RECEIVED");
+    console.log("=".repeat(50));
+    console.log("Full request body:", JSON.stringify(req.body, null, 2));
+
     const result = req.body.Body.stkCallback;
-    console.log(
-      "📩 M-Pesa Callback Received:",
-      JSON.stringify(result, null, 2)
-    );
+    console.log("\nCallback Result:", {
+      ResultCode: result.ResultCode,
+      ResultDesc: result.ResultDesc,
+      CheckoutRequestID: result.CheckoutRequestID,
+      MerchantRequestID: result.MerchantRequestID,
+    });
 
     if (result.ResultCode === 0) {
       // ✅ Payment successful
+      console.log("\n✅ PAYMENT SUCCESSFUL");
+
       const { CheckoutRequestID, CallbackMetadata } = result;
       const amount = CallbackMetadata.Item.find(
         (i) => i.Name === "Amount"
-      ).Value;
+      )?.Value;
 
-      // Mark payment as success
-      await db.run(
+      console.log("Updating payment with:", {
+        checkoutRequestId: CheckoutRequestID,
+        amount: amount,
+        newStatus: "success",
+      });
+
+      const updateResult = await db.run(
         `UPDATE payments
          SET status = ?, amount = ?
          WHERE checkout_request_id = ?`,
         ["success", amount, CheckoutRequestID]
       );
 
-      console.log("✅ Payment marked successful:", CheckoutRequestID);
+      console.log("✅ Payment marked as SUCCESS in database");
+      console.log("Update result:", updateResult);
+
+      // Verify update
+      const verifyPayment = await db.get(
+        `SELECT * FROM payments WHERE checkout_request_id = ?`,
+        [CheckoutRequestID]
+      );
+      console.log("✅ Verification - Updated payment:", verifyPayment);
     } else {
-      // ✅ Payment failed
-      await db.run(
+      // ❌ Payment failed
+      console.log("\n❌ PAYMENT FAILED");
+      console.log("Result Code:", result.ResultCode);
+      console.log("Result Description:", result.ResultDesc);
+
+      const updateResult = await db.run(
         `UPDATE payments
          SET status = ?
          WHERE checkout_request_id = ?`,
         ["failed", result.CheckoutRequestID]
       );
 
-      console.log("❌ Payment failed:", result.CheckoutRequestID);
+      console.log("❌ Payment marked as FAILED in database");
+      console.log("Update result:", updateResult);
     }
 
-    // ✅ Always respond with success to acknowledge callback
+    console.log("=".repeat(50) + "\n");
     res.json({ message: "Callback received successfully" });
   } catch (error) {
-    console.error("Callback error:", error.message);
+    console.error("\n❌ CALLBACK ERROR:");
+    console.error(error);
+    console.log("=".repeat(50) + "\n");
     res.status(500).json({ error: "Callback processing failed" });
   }
 });
+
+
 
 // 🟢 Payment status endpoint
 router.get("/status/:orderId", async (req, res) => {
@@ -325,6 +283,7 @@ router.get("/history/:orderId", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+
 router.post("/complete-payment/:checkoutRequestId", async (req, res) => {
   try {
     console.log("\n" + "=".repeat(50));
