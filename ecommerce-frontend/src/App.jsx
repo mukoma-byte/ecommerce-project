@@ -4,6 +4,7 @@ import { CheckoutPage } from "./pages/checkout/CheckoutPage";
 import { OrdersPage } from "./pages/orders/OrdersPage";
 import { TrackingPage } from "./pages/TrackingPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { SignupPage } from "./pages/auth/SignupPage";
 import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -27,6 +28,10 @@ function App() {
   return (
     <Routes>
       <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
+      <Route
+        path="register"
+        element={<SignupPage />}
+      />
       <Route
         path="checkout"
         element={<CheckoutPage cart={cart} loadCart={loadCart} />}
