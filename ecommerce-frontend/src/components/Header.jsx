@@ -81,7 +81,10 @@ export function Header({ cart }) {
           <div className="cart-text">Cart</div>
         </NavLink>
         <div className="auth-buttons">
-          <button className="login-btn">login</button>
+          <NavLink to="/login">
+            <button className="login-btn">login</button>
+          </NavLink>
+
           <NavLink to="/register">
             <button className="Signup-btn">Sign up</button>
           </NavLink>

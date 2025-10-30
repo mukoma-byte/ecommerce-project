@@ -5,6 +5,7 @@ import { OrdersPage } from "./pages/orders/OrdersPage";
 import { TrackingPage } from "./pages/TrackingPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { SignupPage } from "./pages/auth/SignupPage";
+import { LoginPage } from "./pages/auth/LoginPage";
 import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -56,6 +57,12 @@ function App() {
         path="register"
         element={
           <SignupPage user={user} loadingUser={loadingUser} setUser={setUser} />
+        }
+      />
+      <Route
+        path="login"
+        element={
+          <LoginPage user={user} loadingUser={loadingUser} setUser={setUser} />
         }
       />
       <Route
