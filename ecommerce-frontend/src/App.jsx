@@ -41,19 +41,32 @@ function App() {
 
   return (
     <Routes>
-      <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
-      <Route path="register" element={<SignupPage />} />
+      <Route
+        index
+        element={
+          <HomePage
+            user={user}
+            loadingUser={loadingUser}
+            cart={cart}
+            loadCart={loadCart}
+          />
+        }
+      />
+      <Route
+        path="register"
+        element={<SignupPage user={user} loadingUser={loadingUser} />}
+      />
       <Route
         path="checkout"
-        element={<CheckoutPage cart={cart} loadCart={loadCart} />}
+        element={<CheckoutPage cart={cart} loadCart={loadCart} user={user} />}
       />
       <Route
         path="orders"
-        element={<OrdersPage cart={cart} loadCart={loadCart} />}
+        element={<OrdersPage cart={cart} loadCart={loadCart} user={user} />}
       />
       <Route
         path="tracking/:orderId/:productId"
-        element={<TrackingPage cart={cart} />}
+        element={<TrackingPage cart={cart} user={user} />}
       />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
