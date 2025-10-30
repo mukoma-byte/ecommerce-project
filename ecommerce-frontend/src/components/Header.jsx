@@ -8,7 +8,7 @@ import { useState } from "react";
 import "./Header.css";
 
 
-export function Header({ cart }) {
+export function Header({ user, cart }) {
   /* 
    Initialize the search input from the URL query param so the input reflects any existing ?searchText=... when the component mounts
   (useful for deep-links/bookmarks). 
@@ -80,15 +80,22 @@ export function Header({ cart }) {
           <div className="cart-quantity">{totalQuantity}</div>
           <div className="cart-text">Cart</div>
         </NavLink>
-        <div className="auth-buttons">
-          <NavLink to="/login">
-            <button className="login-btn">login</button>
-          </NavLink>
+        {user ? (
+          <div>
+            <p>{user.name}</p>
+            <button>logout</button>
+          </div>
+        ) : (
+          <div className="auth-buttons">
+            <NavLink to="/login">
+              <button className="login-btn">login</button>
+            </NavLink>
 
-          <NavLink to="/register">
-            <button className="Signup-btn">Sign up</button>
-          </NavLink>
-        </div>
+            <NavLink to="/register">
+              <button className="Signup-btn">Sign up</button>
+            </NavLink>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -52,4 +52,62 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
+router.get("/me", async (req, res) => {
+  try {
+    // Check if session exists
+    if (!req.session.user) {
+      return res.status(200).json({
+        success: true,
+        user: null,
+        message: "No active session",
+      });
+    }
+
+    //  Fetch fresh user data from DB
+    const user = await User.findByPk(req.session.user.id, {
+      attributes: ["id", "name", "email"],
+    });
+
+    //  Handle case where session exists but user was deleted
+    if (!user) {
+      console.warn(
+        `Session exists but user not found (ID: ${req.session.user.id})`
+      );
+      // destroy invalid session
+      req.session.destroy(() => {});
+      return res.status(200).json({
+        success: true,
+        user: null,
+        message: "User not found. Session cleared.",
+      });
+    }
+
+    //  Return valid user
+    res.status(200).json({
+      success: true,
+      user,
+      message: "Session active",
+    });
+  } catch (error) {
+    console.error("Error checking user session:", error);
+
+    //  Handle specific known errors (optional granularity)
+    if (error.name === "SequelizeConnectionError") {
+      return res.status(503).json({
+        success: false,
+        message: "Database temporarily unavailable",
+      });
+    }
+
+    //  Fallback for unexpected errors
+    res.status(500).json({
+      success: false,
+      message: "Failed to check user session",
+    });
+  }
+});
+
+
+
 export default router;
