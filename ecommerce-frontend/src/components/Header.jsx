@@ -4,11 +4,13 @@ import SearchIcon from "../assets/images/icons/search-icon.png";
 import LogoWhiteIcon from "../assets/images/logo-white.png";
 import MobileLogoWhiteIcon from "../assets/images/mobile-logo-white.png";
 import { useState } from "react";
+import {UserDropdown} from "./UserDropdown"
+import axios from "axios";
 
 import "./Header.css";
 
 
-export function Header({ user, cart }) {
+export function Header({ user, cart, setUser, setCart }) {
   /* 
    Initialize the search input from the URL query param so the input reflects any existing ?searchText=... when the component mounts
   (useful for deep-links/bookmarks). 
@@ -21,6 +23,7 @@ export function Header({ user, cart }) {
   const [searchText, setSearchText] = useState(search || "");
 
   const navigate = useNavigate();
+
   const updateSearchInput = (e) => {
     setSearchText(e.target.value);
   };
@@ -34,6 +37,28 @@ export function Header({ user, cart }) {
   cart.forEach((cartItem) => {
     totalQuantity += cartItem.quantity;
   });
+
+    const handleLogout = async () => {
+      try {
+        const response = await axios.post(
+          "/api/auth/logout",
+          {},
+          { withCredentials: true }
+        );
+
+        console.log(response.data.message);
+
+        // Clear frontend state
+        setUser(null);
+        setCart([]); // optional if cart is tied to session
+
+        // Redirect to homepage
+        navigate("/");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        alert("Something went wrong while logging out. Please try again.");
+      }
+    };
 
   return (
     <div className="header">
@@ -81,10 +106,7 @@ export function Header({ user, cart }) {
           <div className="cart-text">Cart</div>
         </NavLink>
         {user ? (
-          <div>
-            <p>{user.name}</p>
-            <button>logout</button>
-          </div>
+          <UserDropdown user={user} onLogout={handleLogout} />
         ) : (
           <div className="auth-buttons">
             <NavLink to="/login">

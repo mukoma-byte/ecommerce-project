@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import './TrackingPage.css'
 
 
-export function TrackingPage({cart, user}){
+export function TrackingPage({cart, user, setUser, setCart}){
   const {orderId, productId} = useParams()
   const [order, setOrder] = useState(null)
 
@@ -38,7 +38,7 @@ export function TrackingPage({cart, user}){
     <>
       <title>Tracking</title>
 
-      <Header cart={cart} user={user} />
+      <Header cart={cart} user={user} setCart={setCart} setUser={setUser} />
 
       <div className="tracking-page">
         <div className="order-tracking">

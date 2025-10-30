@@ -1,0 +1,134 @@
+/* USER DROPDOWN */
+.user-dropdown {
+  position: relative;
+}
+
+.user-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.user-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.user-button:active {
+  transform: translateY(0);
+}
+
+.user-button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.dropdown-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+  font-size: 10px;
+}
+
+.user-button.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  overflow: hidden;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+.dropdown-user-name{
+  color: rgb(8, 79, 45);
+  padding:16px;
+}
+
+.dropdown-user-email{
+  color: rgb(8, 79, 45);
+  padding: 16px;
+}
+
+.label{
+  font-weight: 900;
+  color: darkgreen;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: white;
+  color: rgb(8, 79, 45);
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background-color: rgb(186, 255, 190);
+}
+
+.dropdown-menu button:active {
+  background-color: rgb(170, 240, 175);
+}
+
+@media (max-width: 750px) {
+  .user-button {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 550px) {
+  .user-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .user-name {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dropdown-menu {
+    min-width: 150px;
+  }
+}

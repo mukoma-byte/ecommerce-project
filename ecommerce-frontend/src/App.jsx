@@ -50,6 +50,8 @@ function App() {
             loadingUser={loadingUser}
             cart={cart}
             loadCart={loadCart}
+            setCart={setCart}
+            setUser={setUser}
           />
         }
       />
@@ -71,11 +73,26 @@ function App() {
       />
       <Route
         path="orders"
-        element={<OrdersPage cart={cart} loadCart={loadCart} user={user} />}
+        element={
+          <OrdersPage
+            cart={cart}
+            loadCart={loadCart}
+            user={user}
+            setCart={setCart}
+            setUser={setUser}
+          />
+        }
       />
       <Route
         path="tracking/:orderId/:productId"
-        element={<TrackingPage cart={cart} user={user} />}
+        element={
+          <TrackingPage
+            cart={cart}
+            user={user}
+            setCart={setCart}
+            setUser={setUser}
+          />
+        }
       />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

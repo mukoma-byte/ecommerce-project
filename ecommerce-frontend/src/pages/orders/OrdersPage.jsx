@@ -7,7 +7,7 @@ import BuyAgainIcon from "../../assets/images/icons/buy-again.png";
 
 import "./OrdersPage.css";
 
-export function OrdersPage({ cart, loadCart, user}) {
+export function OrdersPage({ cart, setCart, loadCart, user, setUser}) {
   const [orders, setOrders] = useState([]);
   useEffect(() => {
     async function fetchOrderData() {
@@ -21,7 +21,7 @@ export function OrdersPage({ cart, loadCart, user}) {
       <a rel="icon" type="image/svg+xml" href="images/orders-favicon.png" />
       <title>Orders</title>
 
-      <Header cart={cart} user={user} />
+      <Header cart={cart} user={user} setCart={setCart} setUser={setUser} />
 
       <div className="orders-page">
         <div className="page-title">Your Orders</div>
