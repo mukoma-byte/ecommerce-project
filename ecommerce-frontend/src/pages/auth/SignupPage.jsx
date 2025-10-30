@@ -18,26 +18,51 @@ export function SignupPage({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
+    setLoading(true);
 
     try {
+      // 1️⃣ Send registration request
       const res = await axios.post("/api/auth/register", formData, {
-        withCredentials: true, // include cookies for session
+        withCredentials: true,
       });
 
-      setMessage("✅ Registration successful!");
-      setFormData({ name: "", email: "", password: "" });
-
-      // If backend auto-logs in after signup
-      if (res.data.user) {
-        setUser(res.data.user);
+      // 2️⃣ Optional: check /me to confirm session
+      try {
+        const me = await axios.get("/api/auth/me", { withCredentials: true });
+        setUser(me.data.user);
+      } catch (checkErr) {
+        console.warn("User session not immediately available:", checkErr);
+        // not critical — user might need to refresh
       }
+
+      // 3️⃣ Show success message
+      setMessage("✅ Registration successful! Welcome aboard.");
+      setFormData({ name: "", email: "", password: "" });
     } catch (error) {
-      console.error("Registration failed:", error);
-      setMessage(
-        error.response?.data?.message || "❌ Registration failed. Try again."
-      );
+      console.error("Registration error:", error);
+
+      // Handle known backend errors (status 400, 409, etc.)
+      if (error.response) {
+        if (error.response.status === 400) {
+          setMessage(
+            error.response.data.message ||
+              "⚠️ Invalid input. Check your details."
+          );
+        } else if (error.response.status === 409) {
+          setMessage("⚠️ Email already registered. Try logging in instead.");
+        } else {
+          setMessage(
+            error.response.data.message || "❌ Something went wrong on our end."
+          );
+        }
+      }
+      // Handle network or unknown errors
+      else if (error.request) {
+        setMessage("🌐 Network error — please check your connection.");
+      } else {
+        setMessage("❌ Unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
