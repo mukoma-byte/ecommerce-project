@@ -54,7 +54,9 @@ function App() {
       />
       <Route
         path="register"
-        element={<SignupPage user={user} loadingUser={loadingUser} />}
+        element={
+          <SignupPage user={user} loadingUser={loadingUser} setUser={setUser} />
+        }
       />
       <Route
         path="checkout"
