@@ -11,27 +11,38 @@ import axios from "axios";
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-  window.axios = axios
+  window.axios = axios;
 
-   const loadCart = async () => {
-     const response = await axios.get("/api/cart-items?expand=product");
-     setCart(response.data);
-   };
+  const loadCart = async () => {
+    const response = await axios.get("/api/cart-items?expand=product");
+    setCart(response.data);
+  };
+
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get("/api/auth/me", { withCredentials: true });
+      setUser(res.data.user); // either user object or null
+    } catch (err) {
+      console.error("Error checking session:", err);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  
 
   useEffect(() => {
-   
+    fetchUser();
     loadCart();
-   
   }, []);
 
   return (
     <Routes>
       <Route index element={<HomePage cart={cart} loadCart={loadCart} />} />
-      <Route
-        path="register"
-        element={<SignupPage />}
-      />
+      <Route path="register" element={<SignupPage />} />
       <Route
         path="checkout"
         element={<CheckoutPage cart={cart} loadCart={loadCart} />}
