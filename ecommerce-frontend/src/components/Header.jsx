@@ -80,6 +80,11 @@ export function Header({ cart }) {
           <div className="cart-quantity">{totalQuantity}</div>
           <div className="cart-text">Cart</div>
         </NavLink>
+        <div className="auth-buttons">
+          <button className="login-btn">login</button>
+          <button className="Signup-btn">Sign up</button>
+
+        </div>
       </div>
     </div>
   );
