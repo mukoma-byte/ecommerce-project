@@ -108,6 +108,46 @@ router.get("/me", async (req, res) => {
   }
 });
 
+// routes/auth.js
+
+router.post("/logout", (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(200).json({
+        success: true,
+        message: "No active session to log out from",
+      });
+    }
+
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destruction error:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to log out. Please try again.",
+        });
+      }
+
+      // Clear cookie manually if needed (depending on your setup)
+      res.clearCookie("connect.sid", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Logged out successfully",
+      });
+    });
+  } catch (error) {
+    console.error("Unexpected logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred during logout",
+    });
+  }
+});
 
 
 export default router;
