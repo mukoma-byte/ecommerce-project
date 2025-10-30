@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./SignupPage.css";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 export function SignupPage({ setUser }) {
   const [formData, setFormData] = useState({
@@ -11,6 +11,8 @@ export function SignupPage({ setUser }) {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +42,10 @@ export function SignupPage({ setUser }) {
       // 3️⃣ Show success message
       setMessage("✅ Registration successful! Welcome aboard.");
       setFormData({ name: "", email: "", password: "" });
+
+            setTimeout(() => {
+              navigate("/");
+            }, 800);
     } catch (error) {
       console.error("Registration error:", error);
 

@@ -29,12 +29,16 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
 
+    
+
     // Option 1: Auto-login after registration (recommended)
     req.session.user = {
       id: newUser.id,
       email: newUser.email,
       name: newUser.name,
     };
+
+    console.log(req.session);
 
     // Option 2: Comment out above if you prefer manual login
 

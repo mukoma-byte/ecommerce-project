@@ -2,7 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./LoginPage.css"; // shared styles with SignupPage
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 export function LoginPage({ setUser }) {
   const [formData, setFormData] = useState({
@@ -11,6 +11,8 @@ export function LoginPage({ setUser }) {
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -34,6 +36,11 @@ export function LoginPage({ setUser }) {
       // 3️⃣ Show success message
       setMessage("✅ Login successful! Redirecting...");
       setFormData({ email: "", password: "" });
+
+            setTimeout(() => {
+              navigate("/");
+            }, 800);
+            
     } catch (error) {
       console.error("Login error:", error);
 
