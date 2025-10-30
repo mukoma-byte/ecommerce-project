@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./SignupPage.css";
+import { NavLink } from "react-router";
 
 export function SignupPage({ setUser }) {
   const [formData, setFormData] = useState({
@@ -108,6 +109,12 @@ export function SignupPage({ setUser }) {
         </button>
 
         {message && <p className="signup-message">{message}</p>}
+        <p className="auth-switch">
+          Don’t have an account?{" "}
+          <NavLink to="/login" className="auth-link">
+            Log in
+          </NavLink>
+        </p>
       </form>
     </div>
   );
