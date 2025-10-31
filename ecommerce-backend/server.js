@@ -25,7 +25,7 @@ import SequelizeStoreInit from "connect-session-sequelize";
 const SequelizeStore = SequelizeStoreInit(session.Store);
 
 const store = new SequelizeStore({ db: sequelize });
-store.sync();
+
 
 
 
@@ -45,8 +45,8 @@ app.use(
   session({
     secret: "mySecretKey",
     resave: false,
-    saveUninitialized: false,
-    store,
+    saveUninitialized: true,
+    store: store,
     cookie: {
       httpOnly: true,
       secure: false, // true if using HTTPS
@@ -55,6 +55,9 @@ app.use(
     },
   })
 );
+
+store.sync();
+
 app.use(express.json());
 
 // Serve images from the images folder

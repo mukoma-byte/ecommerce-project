@@ -115,6 +115,8 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    const oldSessionId = req.session.id;
+
     // 4️⃣ Create a session for the user
     req.session.user = {
       id: user.id,
@@ -122,11 +124,13 @@ router.post("/login", async (req, res) => {
       email: user.email,
     };
 
+    await req.session.save();
+
     console.log("User logged in:", req.session.user);
 
     // merge session cart into user cart
     const guestCartItems = await CartItem.findAll({
-      where: { sessionId: req.session.id },
+      where: { sessionId: oldSessionId },
     });
 
     for (const item of guestCartItems) {
@@ -244,10 +248,10 @@ router.post("/logout", (req, res) => {
         sameSite: "lax",
       });
 
-      req.sessionID = null;
-      req.session = null;
+  
+     
       // Optionally create new guest session
-      req.session = {};
+     
 
       res.status(200).json({
         success: true,
