@@ -14,8 +14,6 @@ router.get("/", async (req, res) => {
 
   let whereClause = userId ? { userId } : { sessionId };
 
-  
-
   let cartItems = await CartItem.findAll({
     where: whereClause,
   });
@@ -62,7 +60,7 @@ router.post("/", async (req, res) => {
       quantity,
       deliveryOptionId: "1",
       userId: userId || null,
-      sessionId: userId ? null : sessionId
+      sessionId: userId ? null : sessionId,
     });
   }
 
@@ -73,7 +71,12 @@ router.put("/:productId", async (req, res) => {
   const { productId } = req.params;
   const { quantity, deliveryOptionId } = req.body;
 
-  const cartItem = await CartItem.findOne({ where: { productId } });
+  const userId = req.session.user?.id;
+  const sessionId = req.session.id;
+
+  const whereClause = userId ? { userId, productId } : { sessionId, productId };
+
+  const cartItem = await CartItem.findOne({ where: whereClause });
   if (!cartItem) {
     return res.status(404).json({ error: "Cart item not found" });
   }
@@ -102,7 +105,13 @@ router.put("/:productId", async (req, res) => {
 router.delete("/:productId", async (req, res) => {
   const { productId } = req.params;
 
-  const cartItem = await CartItem.findOne({ where: { productId } });
+  const userId = req.session.user?.id;
+  const sessionId = req.session.id;
+
+  const whereClause = userId ? { userId, productId } : { sessionId, productId };
+
+  const cartItem = await CartItem.findOne({ where: whereClause });
+
   if (!cartItem) {
     return res.status(404).json({ error: "Cart item not found" });
   }
