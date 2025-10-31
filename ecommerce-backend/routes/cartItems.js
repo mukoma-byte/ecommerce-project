@@ -10,9 +10,15 @@ router.get("/", async (req, res) => {
   const userId = req.session.user?.id;
   const sessionId = req.session.id;
 
+  console.log(userId ? { userId } : { sessionId });
+
   let whereClause = userId ? { userId } : { sessionId };
 
-  let cartItems = await CartItem.findAll({ where: whereClause });
+  
+
+  let cartItems = await CartItem.findAll({
+    where: whereClause,
+  });
 
   if (expand === "product") {
     cartItems = await Promise.all(

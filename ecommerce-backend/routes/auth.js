@@ -1,54 +1,86 @@
 // routes/auth.js
 import express from "express";
 import bcrypt from "bcrypt";
-import { User } from "../models/User.js"; // Sequelize model
+import { User } from "../models/User.js";
+import { CartItem } from "../models/CartItem.js";
 
 const router = express.Router();
 
-// REGISTER new user
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Basic validation
-    if (!name || !email || !password)
-      return res.status(400).json({ message: "All fields are required" });
+    // 1️⃣ Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and password are required",
+      });
+    }
 
-    // Check if user already exists
+    // 2️⃣ Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
-    if (existingUser)
-      return res.status(400).json({ message: "Email already registered" });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "An account with this email already exists",
+      });
+    }
 
-    // Hash password
+    // 3️⃣ Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // 4️⃣ Create user
     const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    
-
-    // Option 1: Auto-login after registration (recommended)
+    // 5️⃣ Create session (auto-login)
     req.session.user = {
       id: newUser.id,
-      email: newUser.email,
       name: newUser.name,
+      email: newUser.email,
     };
 
-    console.log(req.session);
+    console.log("User registered:", req.session.user);
 
-    // Option 2: Comment out above if you prefer manual login
+    // 6️⃣ Merge guest cart into user cart
+    const guestCartItems = await CartItem.findAll({
+      where: { sessionId: req.session.id },
+    });
 
+    for (const item of guestCartItems) {
+      const existingItem = await CartItem.findOne({
+        where: { userId: newUser.id, productId: item.productId },
+      });
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+        await existingItem.save();
+        await item.destroy();
+      } else {
+        item.userId = newUser.id;
+        item.sessionId = null;
+        await item.save();
+      }
+    }
+
+    await req.session.save();
+
+    // 7️⃣ Respond with user info
     res.status(201).json({
-      message: "User registered successfully",
-      user: { id: newUser.id, name: newUser.name, email: newUser.email },
+      success: true,
+      message: "Registration successful",
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Registration failed. Try again." });
+    res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred during registration",
+    });
   }
 });
 
@@ -91,6 +123,29 @@ router.post("/login", async (req, res) => {
 
     console.log("User logged in:", req.session.user);
 
+    // merge session cart into user cart
+    const guestCartItems = await CartItem.findAll({
+      where: { sessionId: req.session.id },
+    });
+
+    for (const item of guestCartItems) {
+      const existingItem = await CartItem.findOne({
+        where: { userId: user.id, productId: item.productId },
+      });
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+        await existingItem.save();
+        await item.destroy();
+      } else {
+        item.userId = user.id;
+        item.sessionId = null;
+        await item.save();
+      }
+    }
+
+    await req.session.save();
+
     // 5️⃣ Send success response
     res.status(200).json({
       success: true,
@@ -105,8 +160,6 @@ router.post("/login", async (req, res) => {
     });
   }
 });
-
-
 
 router.get("/me", async (req, res) => {
   try {
@@ -203,6 +256,5 @@ router.post("/logout", (req, res) => {
     });
   }
 });
-
 
 export default router;
