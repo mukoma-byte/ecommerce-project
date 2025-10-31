@@ -66,7 +66,7 @@ function App() {
       <Route
         path="login"
         element={
-          <LoginPage user={user} loadingUser={loadingUser} setUser={setUser} />
+          <LoginPage user={user} loadingUser={loadingUser} setUser={setUser} loadCart={loadCart}/>
         }
       />
       <Route

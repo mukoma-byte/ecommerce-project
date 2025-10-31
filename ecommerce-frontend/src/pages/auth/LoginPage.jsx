@@ -4,7 +4,7 @@ import axios from "axios";
 import "./LoginPage.css"; // shared styles with SignupPage
 import { NavLink, useNavigate } from "react-router";
 
-export function LoginPage({ setUser }) {
+export function LoginPage({ setUser, loadCart }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,6 +36,7 @@ export function LoginPage({ setUser }) {
       // 3️⃣ Show success message
       setMessage("✅ Login successful! Redirecting...");
       setFormData({ email: "", password: "" });
+      loadCart();
 
             setTimeout(() => {
               navigate("/");
