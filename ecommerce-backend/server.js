@@ -84,7 +84,8 @@ app.use((err, req, res, next) => {
 /* eslint-enable no-unused-vars */
 
 // Sync database and load default data if none exist
-await sequelize.sync();
+await sequelize.sync({ alter: true });
+
 
 const productCount = await Product.count();
 if (productCount === 0) {
