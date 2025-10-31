@@ -20,6 +20,10 @@ import { defaultCart } from './defaultData/defaultCart.js';
 import { defaultOrders } from './defaultData/defaultOrders.js';
 import fs from 'fs';
 import session from 'express-session';
+import SequelizeStoreInit from "connect-session-sequelize";
+
+const SequelizeStore = SequelizeStoreInit(session.Store);
+
 
 
 
@@ -41,10 +45,12 @@ app.use(
     secret: "mySecretKey",
     resave: false,
     saveUninitialized: false,
+    store: new SequelizeStore({ db: sequelize }),
     cookie: {
       httpOnly: true,
       secure: false, // true if using HTTPS
       maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: "lax",
     },
   })
 );
