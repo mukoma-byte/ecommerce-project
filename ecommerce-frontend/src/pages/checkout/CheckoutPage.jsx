@@ -29,6 +29,8 @@ export function CheckoutPage({ cart, loadCart }) {
 
     fetchPaymentSummary();
   }, [cart]);
+
+  console.log("Cart data:", cart);
   /*Here we used cart as the dependancy, so that when ever it changes... payment summary is updated,,,, in the case where we update a delivery option of a product(different delivery options have different price ranges) ---- but we are also reloading the delivery options which is not necessary,,,because we update the delivery option in the cart.....then reload the cart, so we will separate the code which renders the payment summary into it's own useEffect*/
   return (
     <>

@@ -37,18 +37,19 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
 
-    // 5️⃣ Create session (auto-login)
+    const oldSessionId = req.session.id;
     req.session.user = {
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
     };
+    await req.session.save();
 
     console.log("User registered:", req.session.user);
 
     // 6️⃣ Merge guest cart into user cart
     const guestCartItems = await CartItem.findAll({
-      where: { sessionId: req.session.id },
+      where: { sessionId: oldSessionId },
     });
 
     for (const item of guestCartItems) {
@@ -242,6 +243,11 @@ router.post("/logout", (req, res) => {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       });
+
+      req.sessionID = null;
+      req.session = null;
+      // Optionally create new guest session
+      req.session = {};
 
       res.status(200).json({
         success: true,

@@ -18,7 +18,9 @@ function App() {
   window.axios = axios;
 
   const loadCart = async () => {
-    const response = await axios.get("/api/cart-items?expand=product");
+    const response = await axios.get("/api/cart-items?expand=product", {
+      withCredentials: true,
+    });
     setCart(response.data);
   };
 
