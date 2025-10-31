@@ -15,25 +15,14 @@ const getWhereClause = (req) => {
 router.get("/", async (req, res) => {
   try {
     const whereClause = getWhereClause(req);
-
     console.log("💰 PAYMENT SUMMARY REQUEST:", whereClause);
 
-    // Get cart items for this user/session with related data
-    const cartItems = await CartItem.findAll({
-      where: whereClause,
-      include: [
-        {
-          model: Product,
-          as: "product",
-        },
-        {
-          model: DeliveryOption,
-          as: "deliveryOption",
-        },
-      ],
-    });
+    // 1️⃣ Get cart items for this user/session
+    const cartItems = await CartItem.findAll({ where: whereClause });
 
-    // If no cart items, return zeros
+    console.log("🧾 CART ITEMS FOUND:", cartItems.length);
+
+    // 2️⃣ If no cart items, return zeros
     if (cartItems.length === 0) {
       return res.json({
         totalItems: 0,
@@ -45,16 +34,30 @@ router.get("/", async (req, res) => {
       });
     }
 
-    // Calculate totals
+    // 3️⃣ Fetch related data manually
+    const detailedItems = await Promise.all(
+      cartItems.map(async (item) => {
+        const product = await Product.findByPk(item.productId);
+        const deliveryOption = await DeliveryOption.findByPk(
+          item.deliveryOptionId
+        );
+
+        return {
+          ...item.toJSON(),
+          product,
+          deliveryOption,
+        };
+      })
+    );
+
+    // 4️⃣ Compute totals
     let totalItems = 0;
     let productCostCents = 0;
     let shippingCostCents = 0;
 
-    for (const item of cartItems) {
+    for (const item of detailedItems) {
       totalItems += item.quantity;
-      productCostCents += item.product.priceCents * item.quantity;
-      
-      // Safely access deliveryOption.priceCents with fallback to 0
+      productCostCents += (item.product?.priceCents || 0) * item.quantity;
       shippingCostCents += item.deliveryOption?.priceCents || 0;
     }
 
