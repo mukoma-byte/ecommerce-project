@@ -24,7 +24,8 @@ import SequelizeStoreInit from "connect-session-sequelize";
 
 const SequelizeStore = SequelizeStoreInit(session.Store);
 
-
+const store = new SequelizeStore({ db: sequelize });
+store.sync();
 
 
 
@@ -45,7 +46,7 @@ app.use(
     secret: "mySecretKey",
     resave: false,
     saveUninitialized: false,
-    store: new SequelizeStore({ db: sequelize }),
+    store,
     cookie: {
       httpOnly: true,
       secure: false, // true if using HTTPS

@@ -13,11 +13,15 @@ export function Product({ product, loadCart }) {
   const [quantity, setQuantity] = useState(1);
   const [isItemInCart, setIsItemInCart] = useState(false);
   const addToCart = async () => {
-    await axios.post("/api/cart-items", {
-      productId: product.id,
-      quantity,
-      // quantity: quantity,
-    });
+    await axios.post(
+      "/api/cart-items",
+      {
+        productId: product.id,
+        quantity,
+        // quantity: quantity,
+      },
+      { withCredentials: true }
+    );
 
     await loadCart();
     setIsItemInCart(true);
