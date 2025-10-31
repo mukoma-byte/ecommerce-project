@@ -53,7 +53,9 @@ router.get("/", async (req, res) => {
     for (const item of cartItems) {
       totalItems += item.quantity;
       productCostCents += item.product.priceCents * item.quantity;
-      shippingCostCents += item.deliveryOption.priceCents;
+      
+      // Safely access deliveryOption.priceCents with fallback to 0
+      shippingCostCents += item.deliveryOption?.priceCents || 0;
     }
 
     const totalCostBeforeTaxCents = productCostCents + shippingCostCents;
