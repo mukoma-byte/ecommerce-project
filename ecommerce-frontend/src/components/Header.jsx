@@ -3,12 +3,12 @@ import CartIcon from "../assets/images/icons/cart-icon.png";
 import SearchIcon from "../assets/images/icons/search-icon.png";
 import LogoWhiteIcon from "../assets/images/logo-white.png";
 import MobileLogoWhiteIcon from "../assets/images/mobile-logo-white.png";
+import StoreIcon from "../assets/images/store.png";
 import { useState } from "react";
-import {UserDropdown} from "./UserDropdown"
+import { UserDropdown } from "./UserDropdown";
 import axios from "axios";
 
 import "./Header.css";
-
 
 export function Header({ user, cart, setUser, setCart }) {
   /* 
@@ -38,34 +38,38 @@ export function Header({ user, cart, setUser, setCart }) {
     totalQuantity += cartItem.quantity;
   });
 
-    const handleLogout = async () => {
-      try {
-        const response = await axios.post(
-          "/api/auth/logout",
-          {},
-          { withCredentials: true }
-        );
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(
+        "/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
 
-        console.log(response.data.message);
+      console.log(response.data.message);
 
-        // Clear frontend state
-        setUser(null);
-        setCart([]); // optional if cart is tied to session
+      // Clear frontend state
+      setUser(null);
+      setCart([]); // optional if cart is tied to session
 
-        // Redirect to homepage
-        navigate("/");
-      } catch (error) {
-        console.error("Logout failed:", error);
-        alert("Something went wrong while logging out. Please try again.");
-      }
-    };
+      // Redirect to homepage
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Something went wrong while logging out. Please try again.");
+    }
+  };
 
   return (
     <div className="header">
       <div className="left-section">
         <NavLink to="/" className="header-link">
-          <img className="logo" src={LogoWhiteIcon} />
-          <img className="mobile-logo" src={MobileLogoWhiteIcon} />
+          <span className="logo-container">
+            <img className="logo" src={StoreIcon} />
+            <span className="logo-text">Online store</span>
+          </span>
+
+          <img className="mobile-logo" src={StoreIcon} />
         </NavLink>
       </div>
 
