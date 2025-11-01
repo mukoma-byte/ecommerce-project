@@ -1,24 +1,25 @@
-import axios from 'axios'
-import { ProductGrid } from './ProductGrid';
-import { useEffect, useState } from 'react';
+import axios from "axios";
+import { ProductGrid } from "./ProductGrid";
+import { useEffect, useState } from "react";
 import { Header } from "../../components/Header";
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from "react-router";
 import "./HomePage.css";
 
-
-export function HomePage({ cart, loadCart,  setCart }) {
+export function HomePage({ cart, loadCart, setCart }) {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
-  const search = searchParams.get('searchText');
+  const search = searchParams.get("searchText");
 
   useEffect(() => {
-   const getHomeData = async () => {
-   const urlPath = search ? `/api/products?search=${search}` : "/api/products";
-   const response = await axios.get(urlPath);
-   setProducts(response.data)
-   }
+    const getHomeData = async () => {
+      const urlPath = search
+        ? `/api/products?search=${search}`
+        : "/api/products";
+      const response = await axios.get(urlPath);
+      setProducts(response.data);
+    };
 
-   getHomeData();
+    getHomeData();
   }, [search]);
 
   return (
@@ -26,7 +27,7 @@ export function HomePage({ cart, loadCart,  setCart }) {
       <link rel="icon" type="image/svg+xml" href="images/home-favicon.png" />
       <title>Home Page</title>
 
-      <Header  cart={cart} setCart={setCart}  />
+      <Header cart={cart} setCart={setCart} />
 
       <div className="home-page">
         <ProductGrid products={products} loadCart={loadCart} />

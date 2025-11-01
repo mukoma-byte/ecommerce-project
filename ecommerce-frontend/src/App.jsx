@@ -13,7 +13,7 @@ import { useAuth } from "./context/AuthContext";
 function App() {
   const [cart, setCart] = useState([]);
 
-  const {user, setUser, loadingUser} = useAuth()
+  const { user, setUser, loadingUser } = useAuth();
 
   window.axios = axios;
 
@@ -32,22 +32,9 @@ function App() {
     <Routes>
       <Route
         index
-        element={
-          <HomePage
-           
-            cart={cart}
-            loadCart={loadCart}
-            setCart={setCart}
-          
-          />
-        }
+        element={<HomePage cart={cart} loadCart={loadCart} setCart={setCart} />}
       />
-      <Route
-        path="register"
-        element={
-          <SignupPage user={user} loadingUser={loadingUser} setUser={setUser} />
-        }
-      />
+      <Route path="register" element={<SignupPage />} />
       <Route
         path="login"
         element={

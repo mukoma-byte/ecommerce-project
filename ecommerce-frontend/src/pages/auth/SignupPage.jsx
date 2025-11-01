@@ -2,8 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import "./SignupPage.css";
 import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 
-export function SignupPage({ setUser }) {
+export function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +12,7 @@ export function SignupPage({ setUser }) {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const {setUser} = useAuth()
 
   const navigate = useNavigate();
 
