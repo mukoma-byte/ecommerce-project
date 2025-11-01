@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router';
 import "./HomePage.css";
 
 
-export function HomePage({ user, cart, loadCart, setUser, setCart }) {
+export function HomePage({ cart, loadCart,  setCart }) {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
   const search = searchParams.get('searchText');
@@ -26,7 +26,7 @@ export function HomePage({ user, cart, loadCart, setUser, setCart }) {
       <link rel="icon" type="image/svg+xml" href="images/home-favicon.png" />
       <title>Home Page</title>
 
-      <Header user={user} cart={cart} setCart={setCart} setUser={setUser} />
+      <Header  cart={cart} setCart={setCart}  />
 
       <div className="home-page">
         <ProductGrid products={products} loadCart={loadCart} />

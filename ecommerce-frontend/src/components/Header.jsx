@@ -7,10 +7,11 @@ import StoreIcon from "../assets/images/store.png";
 import { useState } from "react";
 import { UserDropdown } from "./UserDropdown";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 import "./Header.css";
 
-export function Header({ user, cart, setUser, setCart }) {
+export function Header({ cart, setCart }) {
   /* 
    Initialize the search input from the URL query param so the input reflects any existing ?searchText=... when the component mounts
   (useful for deep-links/bookmarks). 
@@ -22,6 +23,8 @@ export function Header({ user, cart, setUser, setCart }) {
   const search = searchParams.get("searchText");
   const [searchText, setSearchText] = useState(search || "");
 
+  const {user, setUser} = useAuth();
+  
   const navigate = useNavigate();
 
   const updateSearchInput = (e) => {

@@ -9,11 +9,11 @@ import { LoginPage } from "./pages/auth/LoginPage";
 import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useAuth } from "./context/AuthContext";
 function App() {
   const [cart, setCart] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
+
+  const {user, setUser, loadingUser} = useAuth()
 
   window.axios = axios;
 
@@ -24,21 +24,7 @@ function App() {
     setCart(response.data);
   };
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get("/api/auth/me", { withCredentials: true });
-      setUser(res.data.user); // either user object or null
-    } catch (err) {
-      console.error("Error checking session:", err);
-    } finally {
-      setLoadingUser(false);
-    }
-  };
-
-  
-
   useEffect(() => {
-    fetchUser();
     loadCart();
   }, []);
 
@@ -48,12 +34,11 @@ function App() {
         index
         element={
           <HomePage
-            user={user}
-            loadingUser={loadingUser}
+           
             cart={cart}
             loadCart={loadCart}
             setCart={setCart}
-            setUser={setUser}
+          
           />
         }
       />
@@ -66,7 +51,12 @@ function App() {
       <Route
         path="login"
         element={
-          <LoginPage user={user} loadingUser={loadingUser} setUser={setUser} loadCart={loadCart}/>
+          <LoginPage
+            user={user}
+            loadingUser={loadingUser}
+            setUser={setUser}
+            loadCart={loadCart}
+          />
         }
       />
       <Route
