@@ -1,2 +1,3 @@
 ecommerce-backend/.env
 ecommerce-frontend/.env
+./node_modules
