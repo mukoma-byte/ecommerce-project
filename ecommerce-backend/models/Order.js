@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from './index.js';
+import { DataTypes } from "sequelize";
+import { sequelize } from "./index.js";
 
 export const Order = sequelize.define(
   "Order",
@@ -12,11 +12,6 @@ export const Order = sequelize.define(
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: "User",
-        key: "id",
-      },
-      onDelete: "CASCADE", // delete user orders if user is deleted
     },
     orderTimeMs: {
       type: DataTypes.BIGINT,

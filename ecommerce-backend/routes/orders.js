@@ -104,7 +104,7 @@ router.post("/", requireLogin, async (req, res) => {
 
 router.get("/:orderId", requireLogin, async (req, res) => {
   try {
-    const userId = req.sesion.user.id;
+    const userId = req.session.user.id;
     const { orderId } = req.params;
     const expand = req.query.expand;
 
