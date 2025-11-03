@@ -1,7 +1,8 @@
 // mpesaRoutes.js
-const express = require("express");
+import express from "express";
+import axios from "axios";
+
 const router = express.Router();
-const axios = require("axios");
 
 // Store payment status in memory (use a database in production)
 const paymentStatus = new Map();
@@ -144,4 +145,4 @@ router.post("/mpesa/callback", (req, res) => {
   res.json({ ResultCode: 0, ResultDesc: "Success" });
 });
 
-module.exports = router;
+export default router;
