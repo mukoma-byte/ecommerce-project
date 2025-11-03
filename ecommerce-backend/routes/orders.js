@@ -48,7 +48,7 @@ router.post("/", requireLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
 
-    const cartItems = await CartItem.findAll({where: {userId}});
+    const cartItems = await CartItem.findAll({ where: { userId } });
 
     if (cartItems.length === 0) {
       return res.status(400).json({ error: "Cart is empty" });
@@ -89,7 +89,7 @@ router.post("/", requireLogin, async (req, res) => {
       products,
     });
 
-    await CartItem.destroy({ where: {userId} });
+    await CartItem.destroy({ where: { userId } });
 
     res.status(201).json({
       success: true,
@@ -103,31 +103,37 @@ router.post("/", requireLogin, async (req, res) => {
 });
 
 router.get("/:orderId", requireLogin, async (req, res) => {
-  const { orderId } = req.params;
-  const expand = req.query.expand;
+  try {
+    const userId = req.sesion.user.id;
+    const { orderId } = req.params;
+    const expand = req.query.expand;
 
-  let order = await Order.findByPk(orderId);
-  if (!order) {
-    return res.status(404).json({ error: "Order not found" });
+    let order = await Order.findOne({where:{id: orderId, userId}});
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (expand === "products") {
+      const products = await Promise.all(
+        order.products.map(async (product) => {
+          const productDetails = await Product.findByPk(product.productId);
+          return {
+            ...product,
+            product: productDetails,
+          };
+        })
+      );
+      order = {
+        ...order.toJSON(),
+        products,
+      };
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ error: "Failed to fetch order" });
   }
-
-  if (expand === "products") {
-    const products = await Promise.all(
-      order.products.map(async (product) => {
-        const productDetails = await Product.findByPk(product.productId);
-        return {
-          ...product,
-          product: productDetails,
-        };
-      })
-    );
-    order = {
-      ...order.toJSON(),
-      products,
-    };
-  }
-
-  res.json(order);
 });
 
 export default router;
