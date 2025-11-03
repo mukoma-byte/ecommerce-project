@@ -3,14 +3,17 @@ import { useState } from "react";
 import axios from "axios";
 import "./LoginPage.css"; // shared styles with SignupPage
 import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 
-export function LoginPage({ setUser, loadCart }) {
+export function LoginPage({ loadCart }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { setUser } = useAuth();
 
   const navigate = useNavigate();
 
@@ -25,7 +28,7 @@ export function LoginPage({ setUser, loadCart }) {
 
     try {
       // 1️⃣ Login request
-      const res = await axios.post("/api/auth/login", formData, {
+      await axios.post("/api/auth/login", formData, {
         withCredentials: true,
       });
 
@@ -38,10 +41,9 @@ export function LoginPage({ setUser, loadCart }) {
       setFormData({ email: "", password: "" });
       loadCart();
 
-            setTimeout(() => {
-              navigate("/");
-            }, 800);
-            
+      setTimeout(() => {
+        navigate("/");
+      }, 800);
     } catch (error) {
       console.error("Login error:", error);
 

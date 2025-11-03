@@ -1,8 +1,6 @@
 import { NavLink, useNavigate, useSearchParams } from "react-router";
 import CartIcon from "../assets/images/icons/cart-icon.png";
 import SearchIcon from "../assets/images/icons/search-icon.png";
-import LogoWhiteIcon from "../assets/images/logo-white.png";
-import MobileLogoWhiteIcon from "../assets/images/mobile-logo-white.png";
 import StoreIcon from "../assets/images/store.png";
 import { useState } from "react";
 import { UserDropdown } from "./UserDropdown";
@@ -13,7 +11,7 @@ import "./Header.css";
 
 export function Header({ cart, setCart }) {
   /* 
-   Initialize the search input from the URL query param so the input reflects any existing ?searchText=... when the component mounts
+  Initialize the search input from the URL query param so the input reflects any existing ?searchText=... when the component mounts
   (useful for deep-links/bookmarks). 
   useSearchParams.get(...) can return null, so fall back to an empty string to keep the input
   controlled and avoid React's uncontrolled/controlled warnings.
@@ -23,8 +21,8 @@ export function Header({ cart, setCart }) {
   const search = searchParams.get("searchText");
   const [searchText, setSearchText] = useState(search || "");
 
-  const {user, setUser} = useAuth();
-  
+  const { user, setUser } = useAuth();
+
   const navigate = useNavigate();
 
   const updateSearchInput = (e) => {
