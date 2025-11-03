@@ -139,13 +139,13 @@
 }
 
 .button-primary {
-  background: #007bff;
+  background: rgb(25, 135, 84);
   color: white;
   border: none;
 }
 
 .button-primary:hover {
-  background: #006ae6;
+  background: rgb(23, 112, 70);
 }
 
 .button-secondary {
