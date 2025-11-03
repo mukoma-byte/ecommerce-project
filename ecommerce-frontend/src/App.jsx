@@ -6,6 +6,7 @@ import { TrackingPage } from "./pages/TrackingPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { SignupPage } from "./pages/auth/SignupPage";
 import { LoginPage } from "./pages/auth/LoginPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -43,18 +44,22 @@ function App() {
       <Route
         path="orders"
         element={
-          <OrdersPage cart={cart} loadCart={loadCart} setCart={setCart} />
+          <ProtectedRoute>
+            <OrdersPage cart={cart} loadCart={loadCart} setCart={setCart} />
+          </ProtectedRoute>
         }
       />
       <Route
         path="tracking/:orderId/:productId"
         element={
-          <TrackingPage
-            cart={cart}
-            user={user}
-            setCart={setCart}
-            setUser={setUser}
-          />
+          <ProtectedRoute>
+            <TrackingPage
+              cart={cart}
+              user={user}
+              setCart={setCart}
+              setUser={setUser}
+            />
+          </ProtectedRoute>
         }
       />
       <Route path="*" element={<NotFoundPage />} />
