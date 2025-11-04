@@ -7,7 +7,9 @@ export default function MpesaPaymentModal({ totalCost, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const intervalRef = useRef(null);
-
+  const amount = Math.round(totalCost)
+  console.log(amount);
+  
   const initiatePayment = async () => {
     if (!phone) {
       setMessage("Please enter your M-Pesa phone number");
@@ -18,9 +20,9 @@ export default function MpesaPaymentModal({ totalCost, onClose, onSuccess }) {
       setLoading(true);
       setMessage("Sending STK push...");
 
-      const { data } = await axios.post("/api/mpesa/initiate", {
+      const { data } = await axios.post("/api/mpesa/stkpush", {
         phone,
-        amount: totalCost,
+        amount: amount,
       });
 
       const checkoutId = data.CheckoutRequestID;
@@ -65,7 +67,7 @@ export default function MpesaPaymentModal({ totalCost, onClose, onSuccess }) {
           onClick={initiatePayment}
           disabled={loading}
         >
-          {loading ? "Processing..." : `Pay KES ${totalCost}`}
+          {loading ? "Processing..." : `Pay KES ${amount}`}
         </button>
 
         {message && <p className="message-text">{message}</p>}

@@ -79,8 +79,9 @@ export function PaymentSummary({ paymentSummary, loadCart }) {
       </button>
 
       {showModal && (
+        
         <MpesaPaymentModal
-          totalCost={paymentSummary.totalCostCents / 100}
+          totalCost={paymentSummary.totalCostCents / 100 }
           onClose={() => setShowModal(false)}
           onSuccess={handleOrderCreation}
         />
