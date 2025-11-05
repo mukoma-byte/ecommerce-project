@@ -10,6 +10,7 @@ import orderRoutes from './routes/orders.js';
 import resetRoutes from './routes/reset.js';
 import authRoutes from './routes/auth.js';
 import paymentSummaryRoutes from './routes/paymentSummary.js';
+import chatRoutes from "./routes/chat.js";
 import mpesaRoutes from './routes/mpesa.js';
 import { Product } from './models/Product.js';
 import { DeliveryOption } from './models/DeliveryOption.js';
@@ -72,6 +73,7 @@ app.use('/api/cart-items', cartItemRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reset', resetRoutes);
 app.use('/api/payment-summary', paymentSummaryRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/mpesa', mpesaRoutes);
 
 // Serve static files from the dist folder

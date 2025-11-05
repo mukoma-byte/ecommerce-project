@@ -7,13 +7,13 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { SignupPage } from "./pages/auth/SignupPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import Chatbot from "./components/Chatbot";
 import "./App.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./context/AuthContext";
 function App() {
   const [cart, setCart] = useState([]);
-
   const { user, setUser } = useAuth();
 
   window.axios = axios;
@@ -30,40 +30,46 @@ function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route
-        index
-        element={<HomePage cart={cart} loadCart={loadCart} setCart={setCart} />}
-      />
-      <Route path="register" element={<SignupPage />} />
-      <Route path="login" element={<LoginPage loadCart={loadCart} />} />
-      <Route
-        path="checkout"
-        element={<CheckoutPage cart={cart} loadCart={loadCart} />}
-      />
-      <Route
-        path="orders"
-        element={
-          <ProtectedRoute>
-            <OrdersPage cart={cart} loadCart={loadCart} setCart={setCart} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="tracking/:orderId/:productId"
-        element={
-          <ProtectedRoute>
-            <TrackingPage
-              cart={cart}
-              user={user}
-              setCart={setCart}
-              setUser={setUser}
-            />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route
+          index
+          element={
+            <HomePage cart={cart} loadCart={loadCart} setCart={setCart} />
+          }
+        />
+        <Route path="register" element={<SignupPage />} />
+        <Route path="login" element={<LoginPage loadCart={loadCart} />} />
+        <Route
+          path="checkout"
+          element={<CheckoutPage cart={cart} loadCart={loadCart} />}
+        />
+        <Route
+          path="orders"
+          element={
+            <ProtectedRoute>
+              <OrdersPage cart={cart} loadCart={loadCart} setCart={setCart} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="tracking/:orderId/:productId"
+          element={
+            <ProtectedRoute>
+              <TrackingPage
+                cart={cart}
+                user={user}
+                setCart={setCart}
+                setUser={setUser}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+
+      {user && <Chatbot />}
+    </>
   );
 }
 
